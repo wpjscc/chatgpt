@@ -2,7 +2,7 @@
 
 
 ```
-composer create-project wpjscc/chatgpt chatgpt --dev-master
+composer create-project wpjscc/chatgpt chatgpt dev-master
 ```
 
 ## run 
