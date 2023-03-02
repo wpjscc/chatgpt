@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT</title>
+    <script src="/tailwindcss.js"></script>
+	<script src="/alpinejs.js" defer></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        clifford: '#da373d',
+                    }
+                }
+            }
+        }
+    </script>
+
+
+</head>
+<body class="flex flex-col items-center justify-center w-screen min-h-screen bg-gray-100 text-gray-800 p-10">
+	<!-- Component Start -->
+	<div class="flex flex-col flex-grow w-full max-w-xl bg-white shadow-xl rounded-lg overflow-hidden" x-data="{ messages:[] ,content:'',placeholder: 'Type your message…',  message: '', disabled: false}">
+		<div class="flex flex-col flex-grow h-0 p-4 overflow-auto" id="overflow">
+			<template x-for="msg in messages">
+				<div>
+					<template x-if="msg.is_self">
+						<div class="flex w-full mt-2 space-x-3 max-w-xs ml-auto justify-end">
+							<div>
+								<div class="bg-blue-600 text-white p-3 rounded-l-lg rounded-br-lg">
+									<p class="text-sm" x-text="msg.content"></p>
+								</div>
+								<span class="text-xs text-gray-500 leading-none" x-text="msg.time_at"></span>
+							</div>
+							<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
+						</div>
+					</template>
+					<template x-if="!msg.is_self">
+						<div class="flex w-full mt-2 space-x-3 max-w-xs">
+							<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
+							<div>
+								<div class="bg-gray-300 p-3 rounded-r-lg rounded-bl-lg">
+									<p class="text-sm" x-html="msg.content"></p>
+								</div>
+								<span class="text-xs text-gray-500 leading-none" x-text="msg.time_at"></span>
+							</div>
+						</div>
+					</template>
+				</div>
+				
+				
+			</template>
+			<template x-if="!!disabled">
+				<div class="flex w-full mt-2 space-x-3 max-w-xs" >
+					<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
+					<div>
+						<div class="bg-gray-300 p-3 rounded-r-lg rounded-bl-lg">
+							<p class="text-sm" x-html="content"></p>
+						</div>
+						<span class="text-xs text-gray-500 leading-none"></span>
+					</div>
+				</div>
+			</template>
+			
+		</div>
+		
+		<div class="bg-gray-300 p-4">
+			<input class="flex items-center h-10 w-full rounded px-3 text-sm" type="text" x-bind:placeholder="placeholder" x-model="message" @keyup.enter="send($data)" x-bind:disabled="disabled">
+		</div>
+	</div>
+	<!-- Component End  -->
+	<script>
+		function send(data) {
+			autoScroll()
+			data.disabled = true
+			data.content = ''
+			if (!data.message) {
+				data.disabled = false
+				return ;
+			}
+
+			data.messages.push({
+				is_self: true,
+				content: data.message,
+				time_at: new Date().Format("yyyy-MM-dd hh:mm:ss")
+			})
+			var token = getQueryVariable('token');
+			var url = `/chatgpt?query=${encodeURIComponent(data.message)}`;
+			if (token) {
+				url = url + `&token=`+ token
+			}  
+
+			var eventSource = new EventSource(url);
+
+			data.message = '';
+
+			eventSource.onmessage = function (e) {
+				console.log(e)
+				if(e.data == "[DONE]")
+				{	
+					data.messages.push({
+						is_self: false,
+						content: data.content,
+						time_at: new Date().Format("yyyy-MM-dd hh:mm:ss")
+					})
+					data.disabled = false;
+					data.content = ''
+				} else {
+					data.content += JSON.parse(e.data).choices[0].text
+				}
+				autoScroll()
+			};
+			eventSource.onerror = function (e) {
+				console.log(e)
+				if (data.content) {
+					data.messages.push({
+						is_self: false,
+						content: data.content,
+						time_at: new Date().Format("yyyy-MM-dd hh:mm:ss")
+					})
+				}
+				eventSource.close()
+				data.disabled = false
+				autoScroll()
+			};
+		}
+		Date.prototype.Format = function (fmt) { // author: meizz
+			var o = {
+				"M+": this.getMonth() + 1, // 月份
+				"d+": this.getDate(), // 日
+				"h+": this.getHours(), // 小时
+				"m+": this.getMinutes(), // 分
+				"s+": this.getSeconds(), // 秒
+				"q+": Math.floor((this.getMonth() + 3) / 3), // 季度
+				"S": this.getMilliseconds() // 毫秒
+			};
+			if (/(y+)/.test(fmt))
+				fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+			for (var k in o)
+				if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+					return fmt;
+		}
+
+		function getQueryVariable(variable)
+		{
+			var query = window.location.search.substring(1);
+			var vars = query.split("&");
+			for (var i=0;i<vars.length;i++) {
+				var pair = vars[i].split("=");
+				if(pair[0] == variable){return pair[1];}
+			}
+			return(false);
+		}
+		function autoScroll() {
+			var overflow = document.getElementById('overflow');
+				overflow.scrollTop = overflow.scrollHeight;
+		}
+	</script>
+</body>
+
+</html>
