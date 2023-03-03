@@ -93,20 +93,40 @@ function (Psr\Http\Message\ServerRequestInterface $request) {
         // echo strval($body);
         assert($body instanceof \Psr\Http\Message\StreamInterface);
         assert($body instanceof \React\Stream\ReadableStreamInterface);
-    
-        $body->on('data', function ($chunk) use ($stream) {
-            echo $chunk;
-            $stream->write($chunk);
-        });
-    
-        $body->on('error', function (Exception $e) {
-            echo 'Error: ' . $e->getMessage() . PHP_EOL;
-        });
-    
-        $body->on('close', function () use ($stream) {
-            echo '[DONE]' . PHP_EOL;
-            $stream->end();
-        });
+        
+        if (strpos($response->getHeaderLine('Content-Type'), 'application/json') !== false) {
+
+            $body->on('data', function ($chunk) use ($stream) {
+                echo $chunk;
+                $stream->write(getData(addslashes($chunk)));
+            });
+        
+            $body->on('error', function (Exception $e) {
+                echo 'Error: ' . $e->getMessage() . PHP_EOL;
+            });
+        
+            $body->on('close', function () use ($stream) {
+                echo '[DONE]' . PHP_EOL;
+                endStream($stream, '[/?token=xxxxx](?token=xxxxx)');
+            });
+
+        } else {
+            $body->on('data', function ($chunk) use ($stream) {
+                echo $chunk;
+                $stream->write($chunk);
+            });
+        
+            $body->on('error', function (Exception $e) {
+                echo 'Error: ' . $e->getMessage() . PHP_EOL;
+            });
+        
+            $body->on('close', function () use ($stream) {
+                echo '[DONE]' . PHP_EOL;
+                $stream->end();
+            });
+        }
+
+       
     
     }, function (Exception $e) use ($stream) {
         echo 'Error: ' . $e->getMessage() . PHP_EOL;
@@ -130,17 +150,19 @@ function (Psr\Http\Message\ServerRequestInterface $request) {
 });
 
 function endStream($stream, $msg){
-    $stream->write('data: '.json_encode(['choices' => [
+    $stream->write(getData($msg));
+    $stream->write('data: [DONE]');
+    $stream->end();
+}
+
+function getData($msg){
+    return 'data: '.json_encode(['choices' => [
         [
             'delta' => [
                 'content' => $msg
             ]
         ]
-    ]]));
-    $stream->write("\n\n");
-    $stream->write('data: [DONE]');
-    $stream->write("\n\n");
-    $stream->end();
+    ]])."\n\n";  
 }
 
 function getParam($key){
