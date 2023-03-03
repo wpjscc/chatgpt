@@ -45,22 +45,21 @@ $http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterf
 
     $client->withRejectErrorResponse(false)->requestStreaming(
         'POST',
-        'https://api.openai.com/v1/completions',
-         array(
+        'https://api.openai.com/v1/chat/completions',
+        array(
         'Authorization' => 'Bearer '.$token,
         'Content-Type' => 'application/json',
-        'Accept' => 'text/event-stream',
         'Cache-Control' => 'no-cache'
     ), json_encode([
-        'model' => 'text-davinci-003',
-        // 'model' => 'text-davinci-002-render',
-        'prompt' => $query,
-        'temperature' => 0,
-        "max_tokens" => 150,
-        "frequency_penalty" => 0,
-        "presence_penalty" => 0.6,
-        "stream" => true,
-     ]))->then(function (Psr\Http\Message\ResponseInterface $response) use ($stream) {
+        'model' => 'gpt-3.5-turbo',
+        'messages' => [
+            [
+                'role' => 'user',
+                'content' => $query
+            ]
+        ],
+        'stream' => true
+    ])->then(function (Psr\Http\Message\ResponseInterface $response) use ($stream) {
         echo "response";
         echo json_encode($response->getHeaders())."\n";
         $body = $response->getBody();
@@ -84,7 +83,6 @@ $http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterf
     
     }, function (Exception $e) use ($stream) {
         echo 'Error: ' . $e->getMessage() . PHP_EOL;
-        $stream->write('data: {"id":"cmpl-6pbgmdTJZWBk9fnZ9hPAq53XVvMl0","object":"text_completion","created":1677757624,"choices":[{"text":"373","index":0,"logprobs":null,"finish_reason":"length"}],"model":"text-davinci-003"}');
         $stream->write('data: [DONE]');
         $stream->end();
     });

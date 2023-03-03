@@ -109,7 +109,9 @@
 					data.disabled = false;
 					data.content = ''
 				} else {
-					data.content += JSON.parse(e.data).choices[0].text
+					if (JSON.parse(e.data).choices[0].delta.content) {
+						data.content += JSON.parse(e.data).choices[0].delta.content
+					}
 				}
 				autoScroll()
 			};
