@@ -81,7 +81,7 @@
 		window.Prism.manual = true;
 
 		function highlightElement() {
-			document.querySelectorAll('#messages code[class^="language-"]').forEach((element) => {
+			document.querySelectorAll('#messages code').forEach((element) => {
 				window.Prism.highlightElement(element);
 			});
 		}
