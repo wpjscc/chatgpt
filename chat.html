@@ -87,6 +87,7 @@
 				if (q) {
 					data.message = decodeURIComponent(q)
 				}
+				resumeLocalMessages(data)
 				return data
 			})
 		})
@@ -128,6 +129,7 @@
 
 					data.disabled = false;
 					data.content = ''
+					setLocalMessages(data)
 				} else {
 					if (JSON.parse(e.data).choices[0].delta.content) {
 						data.content += JSON.parse(e.data).choices[0].delta.content
@@ -144,6 +146,7 @@
 						content: data.content,
 						time_at: new Date().Format("yyyy-MM-dd hh:mm:ss")
 					})
+					setLocalMessages(data)
 				}
 				eventSource.close()
 				data.disabled = false
@@ -180,6 +183,15 @@
 		function autoScroll() {
 			var overflow = document.getElementById('overflow');
 				overflow.scrollTop = overflow.scrollHeight;
+		}
+
+		function setLocalMessages(data) {
+			localStorage.setItem('messages', JSON.stringify(data.messages))
+		}
+		function resumeLocalMessages(data) {
+			if (localStorage.getItem('messages')) {
+				data.messages = JSON.parse(localStorage.getItem('messages'))
+			}
 		}
 	</script>
 </body>
