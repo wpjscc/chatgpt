@@ -64,7 +64,7 @@ function (Psr\Http\Message\ServerRequestInterface $request) {
 
     if ($path != '/chatgpt' || !$query || !$token) {
         Loop::get()->addTimer(1, function () use ($stream) {
-            endStream($stream, 'not token or not query');
+            endStream($stream, 'not token');
         });
     }
 
