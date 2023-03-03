@@ -5,7 +5,12 @@ require __DIR__.'/vendor/autoload.php';
 use React\Stream\ThroughStream;
 
 
-$http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterface $request) use ($argv) {
+$http = new React\Http\HttpServer(
+    new React\Http\Middleware\LimitConcurrentRequestsMiddleware(10), // 100 concurrent buffering handlers
+    new React\Http\Middleware\RequestBodyBufferMiddleware(0.5 * 1024 * 1024), // 2 MiB per request
+    new React\Http\Middleware\RequestBodyParserMiddleware(),
+    new React\Http\Middleware\LimitConcurrentRequestsMiddleware(1), 
+function (Psr\Http\Message\ServerRequestInterface $request) use ($argv) {
     $connector = null;
 
     if ($argv[3] ?? '') {
