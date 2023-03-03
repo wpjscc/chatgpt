@@ -23,7 +23,7 @@
 </head>
 <body class="flex flex-col items-center justify-center w-screen min-h-screen bg-gray-100 text-gray-800 p-10">
 	<!-- Component Start -->
-	<div class="flex flex-col flex-grow w-full max-w-xl bg-white shadow-xl rounded-lg overflow-hidden" x-data="{ messages:[] ,content:'',placeholder: 'Type your message…',  message: '', disabled: false}">
+	<div class="flex flex-col flex-grow w-full max-w-xl bg-white shadow-xl rounded-lg overflow-hidden" x-data="data" x-init="send($data)">
 		<div class="flex flex-col flex-grow h-0 p-4 overflow-auto" id="overflow">
 			<template x-for="msg in messages">
 				<div>
@@ -73,8 +73,25 @@
 	</div>
 	<!-- Component End  -->
 	<script>
+		
+		document.addEventListener('alpine:init', () => {
+			Alpine.data('data', () => {
+				const data = {
+					messages: [],
+					content:'',
+					placeholder: 'Type your message…',  
+					message: '', 
+					disabled: false
+				}
+				var q = getQueryVariable('q')
+				if (q) {
+					data.message = decodeURIComponent(q)
+				}
+				return data
+			})
+		})
+
 		function send(data) {
-			autoScroll()
 			data.disabled = true
 			data.content = ''
 			if (!data.message) {
@@ -87,6 +104,8 @@
 				content: data.message,
 				time_at: new Date().Format("yyyy-MM-dd hh:mm:ss")
 			})
+			autoScroll()
+
 			var token = getQueryVariable('token');
 			var url = `/chatgpt?query=${encodeURIComponent(data.message)}`;
 			if (token) {
@@ -98,7 +117,6 @@
 			data.message = '';
 
 			eventSource.onmessage = function (e) {
-				console.log(e)
 				if(e.data == "[DONE]")
 				{	
 					data.messages.push({
@@ -106,12 +124,15 @@
 						content: data.content,
 						time_at: new Date().Format("yyyy-MM-dd hh:mm:ss")
 					})
+					console.log(e.data, data.content)
+
 					data.disabled = false;
 					data.content = ''
 				} else {
 					if (JSON.parse(e.data).choices[0].delta.content) {
 						data.content += JSON.parse(e.data).choices[0].delta.content
 					}
+					console.log('data:',data.content)
 				}
 				autoScroll()
 			};
