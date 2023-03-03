@@ -5,9 +5,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatGPT</title>
-	<script src="/tailwindcss.js"></script>
-	<script src="/marked.min.js" defer></script>
-	<script src="/alpinejs.js" defer></script>
+	<link rel="stylesheet" href="/assets/prism.css" />
+	<link rel="stylesheet" href="/assets/prism-light.css" />
+	<script src="/assets/tailwindcss.js"></script>
+	<script src="/assets/marked.min.js" defer></script>
+	<script src="/assets/alpinejs.js" defer></script>
     <script>
         tailwind.config = {
             theme: {
@@ -25,7 +27,7 @@
 <body class="flex flex-col items-center justify-center w-screen min-h-screen bg-gray-100 text-gray-800 md:p-10">
 	<!-- Component Start -->
 	<div class="flex flex-col flex-grow w-full max-w-2xl bg-white shadow-xl rounded-lg overflow-hidden" x-data="data" x-init="send($data,$nextTick)">
-		<div class="flex flex-col flex-grow h-0 p-4 overflow-auto" id="overflow">
+		<div class="flex flex-col flex-grow h-0 p-4 overflow-auto" id="messages">
 			<template x-for="msg in messages">
 				<div class="w-full">
 					<template x-if="msg.is_self">
@@ -44,7 +46,7 @@
 							<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
 							<div class="w-full">
 								<div class="p-3 rounded-r-lg rounded-bl-lg">
-									<div  x-html="markedParse(msg.content)" class="overflow-y-auto prose prose-stone"></div>
+									<div  x-html="markedParse(msg.content)" class="overflow-y-auto prose"></div>
 								</div>
 								<span class="text-xs text-gray-500 leading-none" x-text="msg.time_at"></span>
 							</div>
@@ -59,7 +61,7 @@
 					<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
 					<div class="w-full">
 						<div class="p-3 rounded-r-lg rounded-bl-lg">
-							<div  x-html="markedParse(content)" class="overflow-y-auto prose prose-stone"></div>
+							<div  x-html="markedParse(content)" class="overflow-y-auto prose"></div>
 						</div>
 						<span class="text-xs text-gray-500 leading-none"></span>
 					</div>
@@ -72,6 +74,18 @@
 			<input class="flex items-center h-10 w-full rounded px-3 text-sm" type="text" x-bind:placeholder="placeholder" x-model="message" @keyup.enter="send($data)" x-bind:disabled="disabled">
 		</div>
 	</div>
+	<script src="/assets/prism.js"></script>
+	<script src="/assets/prism-treeview.js"></script>
+	<script>
+		window.Prism = window.Prism || {};
+		window.Prism.manual = true;
+
+		function highlightElement() {
+			document.querySelectorAll('#messages code[class^="language-"]').forEach((element) => {
+				window.Prism.highlightElement(element);
+			});
+		}
+	</script>
 	<!-- Component End  -->
 	<script>
 		
@@ -97,6 +111,7 @@
 			if ($nextTick) {
 				$nextTick(()=>{
 					autoScroll()
+					highlightElement()
 				})
 			}
 
@@ -137,6 +152,7 @@
 					data.disabled = false;
 					data.content = ''
 					setLocalMessages(data)
+					highlightElement()
 				} else {
 					if (JSON.parse(e.data).choices[0].delta.content) {
 						data.content += JSON.parse(e.data).choices[0].delta.content
@@ -187,9 +203,10 @@
 			}
 			return(false);
 		}
+		
 		function autoScroll() {
-			var overflow = document.getElementById('overflow');
-				overflow.scrollTop = overflow.scrollHeight;
+			var messages = document.getElementById('messages');
+			messages.scrollTop = messages.scrollHeight;
 		}
 
 		function setLocalMessages(data) {
