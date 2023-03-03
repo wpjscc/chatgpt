@@ -24,7 +24,7 @@
 </head>
 <body class="flex flex-col items-center justify-center w-screen min-h-screen bg-gray-100 text-gray-800 md:p-10">
 	<!-- Component Start -->
-	<div class="flex flex-col flex-grow w-full max-w-2xl bg-white shadow-xl rounded-lg overflow-hidden" x-data="data" x-init="send($data)">
+	<div class="flex flex-col flex-grow w-full max-w-2xl bg-white shadow-xl rounded-lg overflow-hidden" x-data="data" x-init="send($data,$nextTick)">
 		<div class="flex flex-col flex-grow h-0 p-4 overflow-auto" id="overflow">
 			<template x-for="msg in messages">
 				<div class="w-full">
@@ -93,8 +93,12 @@
 			})
 		})
 
-		function send(data) {
-			autoScroll()
+		function send(data, $nextTick) {
+			if ($nextTick) {
+				$nextTick(()=>{
+					autoScroll()
+				})
+			}
 
 			data.disabled = true
 			data.content = ''
