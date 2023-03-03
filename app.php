@@ -26,6 +26,12 @@ $http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterf
         return \React\Http\Message\Response::html(file_get_contents(__DIR__.'/chat.html'));
     }
 
+    if ($path == '/health') {
+        return \React\Http\Message\Response::json([
+            'is_healthy' => true,
+        ]);
+    }
+
     if ($path == '/tailwindcss.js') {
         return \React\Http\Message\Response::plaintext(file_get_contents(__DIR__.'/tailwindcss.js'));
     }
