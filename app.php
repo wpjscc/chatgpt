@@ -3,16 +3,16 @@
 require __DIR__.'/vendor/autoload.php';
 
 use React\Stream\ThroughStream;
-
+use React\EventLoop\Loop;
 
 $http = new React\Http\HttpServer(
     new React\Http\Middleware\LimitConcurrentRequestsMiddleware(1), // 100 concurrent buffering handlers
     new React\Http\Middleware\RequestBodyBufferMiddleware(0.5 * 1024 * 1024), // 2 MiB per request
-function (Psr\Http\Message\ServerRequestInterface $request) use ($argv) {
+function (Psr\Http\Message\ServerRequestInterface $request) {
     $connector = null;
 
-    if ($argv[3] ?? '') {
-        $proxy = new \Clue\React\HttpProxy\ProxyConnector($argv[3]);
+    if (getParam('--proxy')) {
+        $proxy = new \Clue\React\HttpProxy\ProxyConnector(getParam('--proxy'));
         $connector = new React\Socket\Connector(array(
             'tcp' => $proxy,
             'dns' => false
@@ -22,7 +22,7 @@ function (Psr\Http\Message\ServerRequestInterface $request) use ($argv) {
     $client = (new \React\Http\Browser($connector))->withTimeout(10.0);
     $params = $request->getQueryParams();
     $query = $params['query'] ?? '';
-    $token = $params['token'] ?? ($argv[2] ?? '');
+    $token = $params['token'] ?? (getParam('--token') ?: '');
     $path = $request->getUri()->getPath();
 
     if ($path == '/') {
@@ -59,24 +59,18 @@ function (Psr\Http\Message\ServerRequestInterface $request) use ($argv) {
         );
     }
 
-
-    if ($path != '/chatgpt') {
-        return \React\Http\Message\Response::plaintext('not found');
-    }
+    $stream = new ThroughStream();
 
 
-    if (!$query) {
-        return \React\Http\Message\Response::plaintext('not query');
-    }
-
-    if (!$token) {
-        return \React\Http\Message\Response::plaintext('not token');
+    if ($path != '/chatgpt' || !$query || !$token) {
+        Loop::get()->addTimer(1, function () use ($stream) {
+            endStream($stream, 'not token or not query');
+        });
     }
 
     var_dump($query);
-    $stream = new ThroughStream();
 
-    $client->withRejectErrorResponse(false)->requestStreaming(
+    $token && $query && $client->withRejectErrorResponse(false)->requestStreaming(
         'POST',
         'https://api.openai.com/v1/chat/completions',
         array(
@@ -116,18 +110,7 @@ function (Psr\Http\Message\ServerRequestInterface $request) use ($argv) {
     
     }, function (Exception $e) use ($stream) {
         echo 'Error: ' . $e->getMessage() . PHP_EOL;
-        $data = json_encode(['choices' => [
-            [
-                'delta' => [
-                    'content' => $e->getMessage()
-                ]
-            ]
-        ]]);
-        $stream->write('data: '.$data);
-        $stream->write("\n\n");
-        $stream->write('data: [DONE]');
-        $stream->write("\n\n");
-        $stream->end();
+        endStream($stream, $e->getMessage());
     });
     
     // stop timer if stream is closed (such as when connection is closed)
@@ -146,7 +129,30 @@ function (Psr\Http\Message\ServerRequestInterface $request) use ($argv) {
     );
 });
 
-$socket = new React\Socket\SocketServer('0.0.0.0:'.($argv[1] ?? '8000'));
+function endStream($stream, $msg){
+    $stream->write('data: '.json_encode(['choices' => [
+        [
+            'delta' => [
+                'content' => $msg
+            ]
+        ]
+    ]]));
+    $stream->write("\n\n");
+    $stream->write('data: [DONE]');
+    $stream->write("\n\n");
+    $stream->end();
+}
+
+function getParam($key){
+    foreach ($GLOBALS['argv'] as $arg) {
+        if (strpos($arg, $key) !==false){
+            return explode('=', $arg)[1];
+        }
+    }
+    return ;
+}
+
+$socket = new React\Socket\SocketServer('0.0.0.0:'.(getParam('--port') ?: '8000'));
 $http->listen($socket);
 
 
