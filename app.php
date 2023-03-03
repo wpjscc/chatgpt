@@ -8,7 +8,6 @@ use React\Stream\ThroughStream;
 $http = new React\Http\HttpServer(
     new React\Http\Middleware\LimitConcurrentRequestsMiddleware(1), // 100 concurrent buffering handlers
     new React\Http\Middleware\RequestBodyBufferMiddleware(0.5 * 1024 * 1024), // 2 MiB per request
-    new React\Http\Middleware\RequestBodyParserMiddleware(),
 function (Psr\Http\Message\ServerRequestInterface $request) use ($argv) {
     $connector = null;
 
