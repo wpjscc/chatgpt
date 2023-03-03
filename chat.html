@@ -58,9 +58,9 @@
 			<template x-if="!!disabled">
 				<div class="flex w-full mt-2 space-x-3 max-w-xl" >
 					<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
-					<div>
-						<div class="p-3 rounded-r-lg rounded-bl-lg" x-html="markedParse(content)">
-
+					<div class="w-full">
+						<div class="p-3 rounded-r-lg rounded-bl-lg">
+							<div  x-html="markedParse(content)" class="overflow-y-auto prose prose-stone"></div>
 						</div>
 						<span class="text-xs text-gray-500 leading-none"></span>
 					</div>
