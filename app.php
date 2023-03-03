@@ -33,9 +33,20 @@ $http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterf
     }
     var_dump($path);
 
-    if (in_array($path, ['/assets/tailwindcss.js', '/assets/alpinejs.js', '/assets/marked.min.js' ,'/assets/prism.js', '/assets/prism-treeview.js', '/assets/prism.css', '/assets/prism-light.css'])) {
+    if (in_array($path, ['/assets/tailwindcss.js', '/assets/alpinejs.js', '/assets/marked.min.js' ,'/assets/prism.js', '/assets/prism-treeview.js'])) {
         var_dump('exist:'. $path);
         return \React\Http\Message\Response::plaintext(file_get_contents(__DIR__.$path));
+    }
+
+    if (in_array($path, ['/assets/prism.css', '/assets/prism-light.css'])) {
+        var_dump('exist:css:'. $path);
+        return new React\Http\Message\Response(
+            React\Http\Message\Response::STATUS_OK,
+            array(
+                'Content-Type' => 'text/css',
+            ),
+            file_get_contents(__DIR__.$path)
+        );
     }
 
 
