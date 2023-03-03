@@ -6,9 +6,17 @@ use React\Stream\ThroughStream;
 
 
 $http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterface $request) use ($argv) {
+    $connector = null;
 
+    if ($argv[3] ?? '') {
+        $proxy = new \Clue\React\HttpProxy\ProxyConnector($argv[3]);
+        $connector = new React\Socket\Connector(array(
+            'tcp' => $proxy,
+            'dns' => false
+        ));
+    }
 
-    $client = (new \React\Http\Browser())->withTimeout(10.0);
+    $client = (new \React\Http\Browser($connector))->withTimeout(10.0);
     $params = $request->getQueryParams();
     $query = $params['query'] ?? '';
     $token = $params['token'] ?? ($argv[2] ?? '');
@@ -59,7 +67,7 @@ $http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterf
             ]
         ],
         'stream' => true
-    ])->then(function (Psr\Http\Message\ResponseInterface $response) use ($stream) {
+    ]))->then(function (Psr\Http\Message\ResponseInterface $response) use ($stream) {
         echo "response";
         echo json_encode($response->getHeaders())."\n";
         $body = $response->getBody();

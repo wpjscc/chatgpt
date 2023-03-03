@@ -2,7 +2,8 @@
     "name": "wpjscc/chatgpt",
     "type": "project",
     "require": {
-        "react/http": "^1.8"
+        "react/http": "^1.8",
+        "clue/http-proxy-react": "^1.8"
     },
     "authors": [
         {
