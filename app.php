@@ -33,7 +33,7 @@ $http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterf
     }
     var_dump($path);
 
-    if (in_array($path, ['/tailwindcss.js', '/alpinejs.js', '/marked.min.js', '/typography.min.css'])) {
+    if (in_array($path, ['/tailwindcss.js', '/alpinejs.js', '/marked.min.js'])) {
         var_dump('exist:'. $path);
         return \React\Http\Message\Response::plaintext(file_get_contents(__DIR__.$path));
     }
