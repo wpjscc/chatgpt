@@ -91,7 +91,15 @@ $http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterf
     
     }, function (Exception $e) use ($stream) {
         echo 'Error: ' . $e->getMessage() . PHP_EOL;
+        $data = json_encode(['choices' => [
+            'delta' => [
+                'content' => $e->getMessage()
+            ]
+        ]]);
+        $stream->write('data: '.$data);
+        $stream->write("\n\n");
         $stream->write('data: [DONE]');
+        $stream->write("\n\n");
         $stream->end();
     });
     
