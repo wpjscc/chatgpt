@@ -5,7 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatGPT</title>
+	<link rel="stylesheet" href="/typography.min.css">
     <script src="/tailwindcss.js"></script>
+	<script src="/marked.min.js" defer></script>
 	<script src="/alpinejs.js" defer></script>
     <script>
         tailwind.config = {
@@ -21,12 +23,12 @@
 
 
 </head>
-<body class="flex flex-col items-center justify-center w-screen min-h-screen bg-gray-100 text-gray-800 p-10">
+<body class="flex flex-col items-center justify-center w-screen min-h-screen bg-gray-100 text-gray-800 md:p-10">
 	<!-- Component Start -->
-	<div class="flex flex-col flex-grow w-full max-w-xl bg-white shadow-xl rounded-lg overflow-hidden" x-data="data" x-init="send($data)">
+	<div class="flex flex-col flex-grow w-full max-w-2xl bg-white shadow-xl rounded-lg overflow-hidden" x-data="data" x-init="send($data)">
 		<div class="flex flex-col flex-grow h-0 p-4 overflow-auto" id="overflow">
 			<template x-for="msg in messages">
-				<div>
+				<div class="w-full">
 					<template x-if="msg.is_self">
 						<div class="flex w-full mt-2 space-x-3 max-w-xs ml-auto justify-end">
 							<div>
@@ -39,11 +41,11 @@
 						</div>
 					</template>
 					<template x-if="!msg.is_self">
-						<div class="flex w-full mt-2 space-x-3 max-w-xs">
+						<div class="flex w-full mt-2 space-x-3 max-w-xl">
 							<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
-							<div>
-								<div class="bg-gray-300 p-3 rounded-r-lg rounded-bl-lg">
-									<p class="text-sm" x-html="msg.content"></p>
+							<div class="w-full">
+								<div class="p-3 rounded-r-lg rounded-bl-lg">
+									<div  x-html="markedParse(msg.content)" class="overflow-y-auto prose prose-stone"></div>
 								</div>
 								<span class="text-xs text-gray-500 leading-none" x-text="msg.time_at"></span>
 							</div>
@@ -54,11 +56,11 @@
 				
 			</template>
 			<template x-if="!!disabled">
-				<div class="flex w-full mt-2 space-x-3 max-w-xs" >
+				<div class="flex w-full mt-2 space-x-3 max-w-xl" >
 					<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
 					<div>
-						<div class="bg-gray-300 p-3 rounded-r-lg rounded-bl-lg">
-							<p class="text-sm" x-html="content"></p>
+						<div class="p-3 rounded-r-lg rounded-bl-lg" x-html="markedParse(content)">
+
 						</div>
 						<span class="text-xs text-gray-500 leading-none"></span>
 					</div>
@@ -192,6 +194,10 @@
 			if (localStorage.getItem('messages')) {
 				data.messages = JSON.parse(localStorage.getItem('messages'))
 			}
+		}
+
+		function markedParse(content) {
+			return marked.parse(content)
 		}
 	</script>
 </body>

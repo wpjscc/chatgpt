@@ -31,13 +31,11 @@ $http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterf
             'is_healthy' => true,
         ]);
     }
+    var_dump($path);
 
-    if ($path == '/tailwindcss.js') {
-        return \React\Http\Message\Response::plaintext(file_get_contents(__DIR__.'/tailwindcss.js'));
-    }
-
-    if ($path == '/alpinejs.js') {
-        return \React\Http\Message\Response::plaintext(file_get_contents(__DIR__.'/alpinejs.js'));
+    if (in_array($path, ['/tailwindcss.js', '/alpinejs.js', '/marked.min.js', '/typography.min.css'])) {
+        var_dump('exist:'. $path);
+        return \React\Http\Message\Response::plaintext(file_get_contents(__DIR__.$path));
     }
 
 
