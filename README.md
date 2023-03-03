@@ -10,7 +10,7 @@ composer create-project wpjscc/chatgpt chatgpt dev-master
 ```
 cd chatgpt
 
-php app.php 8080 token
+php app.php --prot=8080 --token=xxx
 ```
 
 ## visit
@@ -22,10 +22,16 @@ http://127.0.0.1:8080
 ## docker
 
 ```
-docker run -p 8080:8080 --rm -it wpjscc/chatgpt php app.php 8080 token
+docker run -p 8080:8080 --rm -it wpjscc/chatgpt php app.php --prot=8080 --token=xxx
 ```
 
 ```
 docker build -t wpjscc/chatgpt . -f Dockerfile
 docker push wpjscc/chatgpt
+```
+
+## proxy
+
+```
+php app.php --prot=8080 --token=xxx --proxy=127.0.0.1:7890
 ```
