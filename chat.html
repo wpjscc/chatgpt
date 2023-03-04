@@ -62,7 +62,7 @@
 					<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
 					<div class="w-full">
 						<div class="p-3 rounded-r-lg rounded-bl-lg">
-							<div  x-html="markedParse(content)" class="prose"></div>
+							<div  x-html="content" class="prose"></div>
 						</div>
 						<span class="text-xs text-gray-500 leading-none"></span>
 					</div>
@@ -80,7 +80,7 @@
 			  </div>
 		  
 	
-			  <div x-show="$store.code.on" class="relative p-4 bg-white w-full rounded-lg shadow-md max-w-4xl" x-html="$store.code.code">
+			  <div x-show="$store.code.on" class="relative p-4 bg-white w-full rounded-lg shadow-md max-w-4xl max-h-screen overflow-y-auto" x-html="$store.code.code">
 					
 			  </div>
 			</div>
