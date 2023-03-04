@@ -56,7 +56,8 @@
 				
 				
 			</template>
-			<template x-if="!!disabled">
+
+			<div class="w-full" :class="disabled ? '' : 'hidden'">
 				<div class="flex w-full mt-2 space-x-3 overflow-auto" >
 					<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
 					<div class="w-full">
@@ -66,8 +67,7 @@
 						<span class="text-xs text-gray-500 leading-none"></span>
 					</div>
 				</div>
-			</template>
-			
+			</div>
 		</div>
 		
 		<div class="bg-gray-300 p-4">
@@ -165,6 +165,9 @@
 					}
 					console.log('data:',data.content)
 				}
+
+				highlightElement()
+
 				autoScroll()
 			};
 			eventSource.onerror = function (e) {
