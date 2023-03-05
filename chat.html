@@ -165,6 +165,8 @@
 			})
 		})
 
+		var max_message = 20
+
 		function send(data, $nextTick) {
 			if ($nextTick) {
 				$nextTick(()=>{
@@ -185,7 +187,9 @@
 				content: data.message,
 				time_at: new Date().Format("yyyy-MM-dd hh:mm:ss")
 			})
-			autoScroll()
+			setTimeout(() => {
+				autoScroll()
+			}, 0);
 
 			var token = getQueryVariable('token');
 			var url = `/chatgpt?query=${encodeURIComponent(data.message)}`;
@@ -271,15 +275,16 @@
 		
 		function autoScroll() {
 			var messages = document.getElementById('messages');
-			messages.scrollTop = messages.scrollHeight;
+			messages.scrollTop = messages.scrollHeight+50;
 		}
 
 		function setLocalMessages(data) {
-			localStorage.setItem('messages', JSON.stringify(data.messages))
+			localStorage.setItem('messages', JSON.stringify(data.messages.slice(-max_message)))
 		}
+		
 		function resumeLocalMessages(data) {
 			if (localStorage.getItem('messages')) {
-				data.messages = JSON.parse(localStorage.getItem('messages'))
+				data.messages =  JSON.parse(localStorage.getItem('messages')).slice(-max_message)
 			}
 		}
 
