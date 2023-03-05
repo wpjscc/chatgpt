@@ -1,3 +1,13 @@
+# 基于reactphp的chagpt web客户端
+
+## 特性
+
+* SSE--实时返回结果（类似于官网）
+* 支持markwon高亮
+* 支持复制markwon代码
+* 支持生成的html代码预览(tailwindcss)
+* 可自定义token（会优先使用url上带着的token）
+
 ## install
 
 
