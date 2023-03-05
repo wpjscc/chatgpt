@@ -73,7 +73,7 @@
 		<div class="bg-gray-300 p-4">
 			<input class="flex items-center h-10 w-full rounded px-3 text-sm" type="text" x-bind:placeholder="placeholder" x-model="message" @keyup.enter="send($data)" x-bind:disabled="disabled">
 		</div>
-		<div  class="fixed z-10 inset-0 overflow-y-auto flex p-4 w-full" x-show="$store.code.on">
+		<div id="preview" class="fixed z-10 inset-0 overflow-y-auto flex p-4 w-full hidden" x-show="$store.code.on">
 			<div class="flex items-center justify-center min-h-screensm:block sm:p-0 w-full">
 			  <div x-show="$store.code.on" @click="$store.code.on = false" class="fixed inset-0 transition-opacity" aria-hidden="true">
 				<div class="absolute inset-0 bg-gray-500 opacity-75"></div>
@@ -130,7 +130,9 @@
 
 	<!-- Component End  -->
 	<script>
-		
+		document.addEventListener('DOMContentLoaded', function() {
+			document.getElementById('preview').classList.remove('hidden')
+		});
 		function getSelectedText() {
 			var selection = window.getSelection();
 			if (selection.rangeCount > 0) {
@@ -143,7 +145,7 @@
 			Alpine.store('code', {
 				code: '',
 				on: false,
-	
+				default: true,
 				toggle() {
 					this.on = ! this.on
 				}
