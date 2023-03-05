@@ -51,6 +51,11 @@ php app.php --prot=8080 --token=xxx --proxy=127.0.0.1:7890
 
 http://127.0.0.1:8080?token=xxxxxx
 
+or
+online visit 
+
+https://chatgpt.xiaofuwu.wpjs.cc
+
 
 ## example
 
