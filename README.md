@@ -7,6 +7,7 @@
 * 支持复制markwon代码
 * 支持生成的html代码预览(tailwindcss)
 * 可自定义token（会优先使用url上带着的token）
+* 支持代理
 
 ## install
 
