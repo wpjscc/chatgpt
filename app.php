@@ -36,7 +36,7 @@ function (Psr\Http\Message\ServerRequestInterface $request) {
     }
     var_dump($path);
 
-    if (in_array($path, ['/assets/tailwindcss.js', '/assets/alpinejs.js', '/assets/marked.min.js' ,'/assets/prism.js', '/assets/prism-treeview.js'])) {
+    if (in_array($path, ['/assets/tailwindcss.js', '/assets/alpinejs.js', '/assets/markdown-it.min.js' ,'/assets/prism.js', '/assets/prism-treeview.js'])) {
         return new React\Http\Message\Response(
             React\Http\Message\Response::STATUS_OK,
             array(

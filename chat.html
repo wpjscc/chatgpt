@@ -8,7 +8,7 @@
 	<link rel="stylesheet" href="/assets/prism.css" />
 	<link rel="stylesheet" href="/assets/prism-light.css" />
 	<script src="/assets/tailwindcss.js"></script>
-	<script src="/assets/marked.min.js" defer></script>
+	<script src="/assets/markdown-it.min.js" defer></script>
 	<script src="/assets/alpinejs.js" defer></script>
     <script>
         tailwind.config = {
@@ -61,8 +61,8 @@
 				<div class="flex w-full mt-2 space-x-3 overflow-auto" >
 					<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
 					<div class="w-full">
-						<div class="p-3 rounded-r-lg rounded-bl-lg">
-							<div  x-html="content" class="prose"></div>
+						<div class="p-3 rounded-r-lg rounded-bl-lg" id="messages-stream">
+							<div  x-html="markedParse(content)" class="prose"></div>
 						</div>
 						<span class="text-xs text-gray-500 leading-none"></span>
 					</div>
@@ -97,6 +97,7 @@
 				window.Prism.highlightElement(element);
 			});
 		}
+
 		Prism.plugins.toolbar.registerButton('preview', function(env) {
 			var button = document.createElement('button');
 			button.innerHTML = 'Preview';
@@ -204,8 +205,6 @@
 						content: data.content,
 						time_at: new Date().Format("yyyy-MM-dd hh:mm:ss")
 					})
-					console.log(e.data, data.content)
-
 					data.disabled = false;
 					data.content = ''
 					setLocalMessages(data)
@@ -216,6 +215,7 @@
 						})
 					}
 
+					console.log('[DONE]')
 				} else {
 					if (JSON.parse(e.data).choices[0].delta.content) {
 						data.content += JSON.parse(e.data).choices[0].delta.content
@@ -284,7 +284,8 @@
 		}
 
 		function markedParse(content) {
-			return marked.parse(content)
+			var md = window.markdownit();
+			return md.render(content)
 		}
 	</script>
 </body>
