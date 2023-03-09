@@ -30,7 +30,7 @@
 				<ul class="border-b">
 				  <template x-for="role,index in $store.roles.data">
 					<li class="p-4">
-						<a x-bind:href="'#roles-'+role.id" class="font-medium hover:text-indigo-500" :class="[$store.roles.id == role.id ? 'text-indigo-600' : '']" x-text="role.name" @click="$store.roles.click($store,$data,role.id)">
+						<a x-bind:href="'#roles-'+role.id" class="font-medium hover:text-indigo-500" :class="[$store.roles.id == role.id ? 'text-indigo-600' : '']" x-text="role.name" @click="$store.roles.click($store,$data,$nextTick,role.id)">
 						  
 						</a>
 					  </li>
@@ -196,9 +196,13 @@
 					}
 				],
 				id: 1,
-				click(store, data, id){
+				click(store, data, $nextTick ,id){
 					this.id = id
 					data.messages = this.data[this.getIndex()].messages
+					$nextTick(()=>{
+						autoScroll()
+						highlightElement()
+					})
 				},
 				getIndex(id){
 					return this.data.indexOf(this.data.find((item) => {
