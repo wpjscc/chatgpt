@@ -400,8 +400,11 @@
 		}
 		
 		function autoScroll() {
-			var messages = document.getElementById('messages');
-			messages.scrollTop = messages.scrollHeight+50;
+			setTimeout(() => {
+				var messages = document.getElementById('messages');
+				messages.scrollTop = messages.scrollHeight+50;
+			}, 0);
+		
 		}
 
 		function setLocalRoles(store, data) {
