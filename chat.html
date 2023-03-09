@@ -192,18 +192,39 @@
 					},
 					{
 						id: 2,
-						name: '充当英语翻译和改进者',
+						name: '作为英语翻译和改进者',
 						messages: [],
 						prompt: 'I want you to act as an English translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in English. I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, upper level English words and sentences. Keep the meaning same, but make them more literary. I want you to only reply the correction, the improvements and nothing else, do not write explanations. My first sentence is "{prompt}"',
 						default: ''
 					},
 					{
 						id: 3,
-						name: '充当中文翻译和改进者',
+						name: '作为中文翻译和改进者',
 						messages: [],
 						prompt: 'I want you to act as an Chinese translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in Chinese. I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, upper level Chinese words and sentences. Keep the meaning same, but make them more literary. I want you to only reply the correction, the improvements and nothing else, do not write explanations. My first sentence is "{prompt}"',
 						default: ''
-					}
+					},
+					{
+						id: 10,
+						name: '作为 Linux 终端',
+						messages: [],
+						prompt: 'I want you to act as a linux terminal. I will type commands and you will reply with what the terminal should show. I want you to only reply with the terminal output inside one unique code block, and nothing else. do not write explanations. do not type commands unless I instruct you to do so. When I need to tell you something in English, I will do so by putting text inside curly brackets {like this}. My first command is {prompt}',
+						default: ''
+					},
+					{
+						id: 11,
+						name: '作为 JavaScript 控制台',
+						messages: [],
+						prompt: 'I want you to act as a javascript console. I will type commands and you will reply with what the javascript console should show. I want you to only reply with the terminal output inside one unique code block, and nothing else. do not write explanations. do not type commands unless I instruct you to do so. when I need to tell you something in english, I will do so by putting text inside curly brackets {like this}. My first command is {prompt};',
+						default: ''
+					},
+					{
+						id: 12,
+						name: '作为 PHP 解释器',
+						messages: [],
+						prompt: 'I want you to act like a php interpreter. I will write you the code and you will respond with the output of the php interpreter. I want you to only reply with the terminal output inside one unique code block, and nothing else. do not write explanations. Do not type commands unless I instruct you to do so. When i need to tell you something in english, i will do so by putting text inside curly brackets {like this}. My first command is <?php {prompt}',
+						default: ''
+					},
 				],
 				id: 1,
 				click(store, data, $nextTick ,id){
@@ -215,12 +236,16 @@
 					})
 				},
 				getIndex(id){
-					return this.data.indexOf(this.data.find((item) => {
+					var index = this.data.indexOf(this.data.find((item) => {
 						if (id) {
 							return item.id == id;
 						}
 						return item.id == this.id;
 					}))
+					if (index==-1) {
+						return 0
+					}
+					return index
 				},
 				setIdByHash(hash){
 					if (hash) {
