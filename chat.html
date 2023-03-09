@@ -24,72 +24,89 @@
 
 
 </head>
-<body class="flex flex-col items-center justify-center w-screen min-h-screen bg-gray-100 text-gray-800 md:p-10">
-	<!-- Component Start -->
-	<div class="flex flex-col flex-grow w-full max-w-4xl bg-white shadow-xl rounded-lg overflow-hidden relative" x-data="data" x-init="send($data,$nextTick)">
-		<div class="flex flex-col flex-grow h-0 p-4 overflow-auto" id="messages" x-ref="scrollDiv" @scroll="$refs.scrollDiv.scrollTop < 200 ? $refs.buttonTop.classList.add('hidden') :  $refs.buttonTop.classList.remove('hidden')">
-			<template x-for="msg in messages">
-				<div class="w-full">
-					<template x-if="msg.is_self">
-						<div class="flex w-full mt-2 space-x-3 max-w-xs ml-auto justify-end ">
-							<div>
-								<div class="bg-blue-600 text-white p-3 rounded-l-lg rounded-br-lg ">
-									<p class="text-sm" x-text="msg.content"></p>
-								</div>
-								<span class="text-xs text-gray-500 leading-none" x-text="msg.time_at"></span>
-							</div>
-							<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
-						</div>
-					</template>
-					<template x-if="!msg.is_self">
-						<div class="flex w-full mt-2 space-x-3 overflow-auto">
-							<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
+<body class="flex flex-col items-center justify-center w-screen min-h-screen bg-gray-100 text-gray-800" x-data="data" x-init="init($store, $data, $nextTick)">
+		<div class="flex w-full max-w-5xl">
+			<div class="bg-white w-64 hidden sm:block overflow-auto">
+				<ul class="border-b">
+				  <template x-for="role,index in $store.roles.data">
+					<li class="p-4">
+						<a x-bind:href="'#roles-'+role.id" class="font-medium hover:text-indigo-500" :class="[$store.roles.id == role.id ? 'text-indigo-600' : '']" x-text="role.name" @click="$store.roles.click($store,$data,role.id)">
+						  
+						</a>
+					  </li>
+				  </template>
+				</ul>
+			</div>
+			<div class="flex-grow w-full">
+				<!-- Component Start -->
+				<div class="flex flex-col flex-grow w-full max-w-4xl bg-white shadow-xl rounded-lg overflow-hidden min-h-screen relative">
+					<div class="flex flex-col flex-grow h-0 p-4 overflow-auto" id="messages" x-ref="scrollDiv" @scroll="$refs.scrollDiv.scrollTop < 200 ? $refs.buttonTop.classList.add('hidden') :  $refs.buttonTop.classList.remove('hidden')">
+						<template x-for="msg in messages">
 							<div class="w-full">
-								<div class="p-3 rounded-r-lg rounded-bl-lg">
-									<div  x-html="markedParse(msg.content)" class="prose"></div>
+								<template x-if="msg.is_self">
+									<div class="flex w-full mt-2 space-x-3 max-w-xs ml-auto justify-end ">
+										<div>
+											<div class="bg-blue-600 text-white p-3 rounded-l-lg rounded-br-lg ">
+												<p class="text-sm" x-text="msg.content"></p>
+											</div>
+											<span class="text-xs text-gray-500 leading-none" x-text="msg.time_at"></span>
+										</div>
+										<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
+									</div>
+								</template>
+								<template x-if="!msg.is_self">
+									<div class="flex w-full mt-2 space-x-3 overflow-auto">
+										<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
+										<div class="w-full">
+											<div class="p-3 rounded-r-lg rounded-bl-lg">
+												<div  x-html="markedParse(msg.content)" class="prose"></div>
+											</div>
+											<span class="text-xs text-gray-500 leading-none" x-text="msg.time_at"></span>
+										</div>
+									</div>
+								</template>
+							</div>
+							
+							
+						</template>
+	
+						<div class="w-full" :class="disabled ? '' : 'hidden'">
+							<div class="flex w-full mt-2 space-x-3 overflow-auto" >
+								<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
+								<div class="w-full">
+									<div class="p-3 rounded-r-lg rounded-bl-lg" id="messages-stream">
+										<div  x-html="markedParse(content)" class="prose"></div>
+									</div>
+									<span class="text-xs text-gray-500 leading-none"></span>
 								</div>
-								<span class="text-xs text-gray-500 leading-none" x-text="msg.time_at"></span>
 							</div>
 						</div>
-					</template>
-				</div>
-				
-				
-			</template>
-
-			<div class="w-full" :class="disabled ? '' : 'hidden'">
-				<div class="flex w-full mt-2 space-x-3 overflow-auto" >
-					<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
-					<div class="w-full">
-						<div class="p-3 rounded-r-lg rounded-bl-lg" id="messages-stream">
-							<div  x-html="markedParse(content)" class="prose"></div>
+					</div>
+					
+					<div class="bg-gray-300 p-4">
+						<input class="flex items-center h-10 w-full rounded px-3 text-sm" type="text" x-bind:placeholder="placeholder" x-model="message" @keyup.enter="send($store,$data)" x-bind:disabled="disabled">
+					</div>
+					<!-- Scroll to top button -->
+					<button class="absolute bottom-20 -right-1  text-white font-bold py-2 px-4 rounded hidden"  x-ref="buttonTop" @click="$refs.scrollDiv.scrollTop=0">
+						👆
+					</button>
+					<div id="preview" class="fixed z-10 inset-0 overflow-y-auto flex p-4 w-full hidden" x-show="$store.code.on">
+						<div class="flex items-center justify-center min-h-screensm:block sm:p-0 w-full">
+						<div x-show="$store.code.on" @click="$store.code.on = false" class="fixed inset-0 transition-opacity" aria-hidden="true">
+							<div class="absolute inset-0 bg-gray-500 opacity-75"></div>
 						</div>
-						<span class="text-xs text-gray-500 leading-none"></span>
+					
+				
+						<div x-show="$store.code.on" class="relative p-4 bg-white w-full rounded-lg shadow-md max-w-4xl max-h-screen overflow-y-auto" x-html="$store.code.code">
+								
+						</div>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		
-		<div class="bg-gray-300 p-4">
-			<input class="flex items-center h-10 w-full rounded px-3 text-sm" type="text" x-bind:placeholder="placeholder" x-model="message" @keyup.enter="send($data)" x-bind:disabled="disabled">
-		</div>
-		<!-- Scroll to top button -->
-		<button class="absolute bottom-20 -right-1  text-white font-bold py-2 px-4 rounded hidden"  x-ref="buttonTop" @click="$refs.scrollDiv.scrollTop=0">
-			👆
-		</button>
-		<div id="preview" class="fixed z-10 inset-0 overflow-y-auto flex p-4 w-full hidden" x-show="$store.code.on">
-			<div class="flex items-center justify-center min-h-screensm:block sm:p-0 w-full">
-			  <div x-show="$store.code.on" @click="$store.code.on = false" class="fixed inset-0 transition-opacity" aria-hidden="true">
-				<div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-			  </div>
-		  
-	
-			  <div x-show="$store.code.on" class="relative p-4 bg-white w-full rounded-lg shadow-md max-w-4xl max-h-screen overflow-y-auto" x-html="$store.code.code">
-					
-			  </div>
-			</div>
-		</div>
-	</div>
+
+
 	<script src="/assets/prism.js"></script>
 	<script src="/assets/prism-treeview.js"></script>
 	<script>
@@ -154,6 +171,64 @@
 					this.on = ! this.on
 				}
 			})
+			Alpine.store('roles', {
+				data: [
+					{
+						id: 1,
+						name: '随便聊聊',
+						messages: [],
+						prompt: '',
+						default: ''
+					},
+					{
+						id: 2,
+						name: '翻译成英文',
+						messages: [],
+						prompt: 'I want you to act as an English translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in English. I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, upper level English words and sentences. Keep the meaning same, but make them more literary. I want you to only reply the correction, the improvements and nothing else, do not write explanations. My first sentence is "{prompt}"',
+						default: ''
+					},
+					{
+						id: 3,
+						name: '翻译成中文',
+						messages: [],
+						prompt: 'I want you to act as an Chinese translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in English. I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, upper level English words and sentences. Keep the meaning same, but make them more literary. I want you to only reply the correction, the improvements and nothing else, do not write explanations. My first sentence is "{prompt}"',
+						default: ''
+					}
+				],
+				id: 1,
+				click(store, data, id){
+					this.id = id
+					data.messages = this.data[this.getIndex()].messages
+				},
+				getIndex(){
+					return this.data.indexOf(this.data.find((item) => {
+						return item.id == this.id;
+					}))
+				},
+				setIdByHash(hash){
+					if (hash) {
+						try {
+							var hashs = hash.split('-')
+							if (hashs.length == 2) {
+								var key = hashs[0]
+								var id = parseInt(hashs[1])
+								if (key == 'roles') {
+									this.id = id
+								}
+							}
+						} catch (error) {
+							console.error(error)
+						}
+						
+					}
+				},
+				transformMessage(message){
+					if (this.data[this.getIndex()].prompt) {
+						return this.data[this.getIndex()].prompt.replace('{prompt}', message)
+					}
+					return message
+				}
+			})
 			Alpine.data('data', () => {
 				const data = {
 					messages: [],
@@ -166,14 +241,16 @@
 				if (q) {
 					data.message = decodeURIComponent(q)
 				}
-				resumeLocalMessages(data)
 				return data
 			})
 		})
 
 		var max_message = 20
-
-		function send(data, $nextTick) {
+		function init(store, data, $nextTick) {
+			resumeLocalRoles(store, data)
+			send(store, data, $nextTick)
+		}
+		function send(store, data, $nextTick) {
 			if ($nextTick) {
 				$nextTick(()=>{
 					autoScroll()
@@ -198,7 +275,7 @@
 			}, 0);
 
 			var token = getQueryVariable('token');
-			var url = `/chatgpt?query=${encodeURIComponent(data.message)}`;
+			var url = `/chatgpt?query=${encodeURIComponent(store.roles.transformMessage(data.message))}`;
 			if (token) {
 				url = url + `&token=`+ token
 			}  
@@ -210,14 +287,14 @@
 			eventSource.onmessage = function (e) {
 				if(e.data == "[DONE]")
 				{	
-					data.messages.push({
+					store.roles.data[store.roles.getIndex()].messages.push({
 						is_self: false,
 						content: data.content,
 						time_at: new Date().Format("yyyy-MM-dd hh:mm:ss")
 					})
 					data.disabled = false;
 					data.content = ''
-					setLocalMessages(data)
+					setLocalRoles(store, data)
 					if ($nextTick) {
 						$nextTick(()=>{
 							autoScroll()
@@ -238,12 +315,13 @@
 			eventSource.onerror = function (e) {
 				console.log(e)
 				if (data.content) {
-					data.messages.push({
+					store.roles.data[store.roles.getIndex()].messages.push({
 						is_self: false,
 						content: data.content,
 						time_at: new Date().Format("yyyy-MM-dd hh:mm:ss")
 					})
-					setLocalMessages(data)
+					data.messages = 
+					setLocalRoles(store, data)
 				}
 				eventSource.close()
 				data.disabled = false
@@ -284,19 +362,27 @@
 			messages.scrollTop = messages.scrollHeight+50;
 		}
 
-		function setLocalMessages(data) {
-			localStorage.setItem('messages', JSON.stringify(data.messages.slice(-max_message)))
+		function setLocalRoles(store, data) {
+			store.roles.data[store.roles.getIndex()].messages = store.roles.data[store.roles.getIndex()].messages.slice(-max_message)
+			data.messages = store.roles.data[store.roles.getIndex()].messages
+			localStorage.setItem('roles', JSON.stringify(store.roles.data))
 		}
 		
-		function resumeLocalMessages(data) {
-			if (localStorage.getItem('messages')) {
-				data.messages =  JSON.parse(localStorage.getItem('messages')).slice(-max_message)
+		function resumeLocalRoles(store, data) {
+			if (localStorage.getItem('roles')) {
+				store.roles.setIdByHash(getLocationHash())
+				store.roles.data =  JSON.parse(localStorage.getItem('roles'))
+				data.messages = store.roles.data[store.roles.getIndex()].messages
 			}
 		}
 
 		function markedParse(content) {
 			var md = window.markdownit();
 			return md.render(content)
+		}
+
+		function getLocationHash() {
+			return window.location.hash.substring(1);
 		}
 	</script>
 </body>
