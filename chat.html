@@ -191,7 +191,7 @@
 						id: 3,
 						name: '翻译成中文',
 						messages: [],
-						prompt: 'I want you to act as an Chinese translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in English. I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, upper level English words and sentences. Keep the meaning same, but make them more literary. I want you to only reply the correction, the improvements and nothing else, do not write explanations. My first sentence is "{prompt}"',
+						prompt: 'I want you to act as an Chinese translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in Chinese. I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, upper level Chinese words and sentences. Keep the meaning same, but make them more literary. I want you to only reply the correction, the improvements and nothing else, do not write explanations. My first sentence is "{prompt}"',
 						default: ''
 					}
 				],
@@ -200,8 +200,11 @@
 					this.id = id
 					data.messages = this.data[this.getIndex()].messages
 				},
-				getIndex(){
+				getIndex(id){
 					return this.data.indexOf(this.data.find((item) => {
+						if (id) {
+							return item.id == id;
+						}
 						return item.id == this.id;
 					}))
 				},
@@ -320,7 +323,6 @@
 						content: data.content,
 						time_at: new Date().Format("yyyy-MM-dd hh:mm:ss")
 					})
-					data.messages = 
 					setLocalRoles(store, data)
 				}
 				eventSource.close()
@@ -363,16 +365,19 @@
 		}
 
 		function setLocalRoles(store, data) {
-			store.roles.data[store.roles.getIndex()].messages = store.roles.data[store.roles.getIndex()].messages.slice(-max_message)
+			store.roles.data[store.roles.getIndex()].messages = JSON.parse(JSON.stringify(store.roles.data[store.roles.getIndex()].messages)).slice(-max_message)
 			data.messages = store.roles.data[store.roles.getIndex()].messages
 			localStorage.setItem('roles', JSON.stringify(store.roles.data))
 		}
 		
 		function resumeLocalRoles(store, data) {
+			store.roles.setIdByHash(getLocationHash())
 			if (localStorage.getItem('roles')) {
-				store.roles.setIdByHash(getLocationHash())
-				store.roles.data =  JSON.parse(localStorage.getItem('roles'))
-				data.messages = store.roles.data[store.roles.getIndex()].messages
+				var roles = JSON.parse(localStorage.getItem('roles'))
+				for (const element of roles) {
+					store.roles.data[store.roles.getIndex(element.id)].messages = element.messages
+				}
+				data.messages =  store.roles.data[store.roles.getIndex()].messages
 			}
 		}
 
