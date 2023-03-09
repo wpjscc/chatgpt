@@ -47,7 +47,7 @@
 				  </template>
 				</ul>
 			</div>
-			<div class="flex-grow w-full">
+			<div class="flex-grow w-full" @click="open_menu=false">
 				<!-- Component Start -->
 				<div class="flex flex-col flex-grow w-full max-w-4xl bg-white shadow-xl rounded-lg overflow-hidden min-h-screen relative">
 					<div class="flex flex-col flex-grow h-0 p-4 overflow-auto" id="messages" x-ref="scrollDiv" @scroll="$refs.scrollDiv.scrollTop < 200 ? $refs.buttonTop.classList.add('hidden') :  $refs.buttonTop.classList.remove('hidden')">
