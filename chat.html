@@ -288,11 +288,15 @@
 						var hash = getLocationHash();
 						this.setIdByHash(hash)
 						data.messages = this.data[this.getIndex()].messages
+						this.setTitle()
 						$nextTick(()=>{
 							autoScroll()
 							highlightElement()
 						})
 					})
+				},
+				setTitle(){
+					document.title = "ChatGPT-"+this.data[this.getIndex()].name;
 				},
 				changeRole(store, data, $nextTick ,id){
 				
