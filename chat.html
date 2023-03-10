@@ -40,7 +40,7 @@
 				<ul class="border-b">
 				  <template x-for="role,index in $store.roles.data">
 					<li class="p-4">
-						<a x-bind:href="'#roles-'+role.id" class="font-medium hover:text-indigo-500" :class="[$store.roles.id == role.id ? 'text-indigo-600' : '']" x-text="role.name" @click="open_menu=false;$store.roles.click($store,$data,$nextTick,role.id)">
+						<a x-bind:href="'#roles-'+role.id" class="font-medium hover:text-indigo-500" :class="[$store.roles.id == role.id ? 'text-indigo-600' : '']" x-text="role.name" @click="open_menu=false;$store.roles.changeRole($store,$data,$nextTick,role.id)">
 						  
 						</a>
 					  </li>
@@ -188,6 +188,7 @@
 
 	<!-- Component End  -->
 	<script>
+
 		document.addEventListener('DOMContentLoaded', function() {
 			document.getElementById('preview').classList.remove('hidden')
 		});
@@ -268,13 +269,21 @@
 					},
 				],
 				id: 1,
-				click(store, data, $nextTick ,id){
-					this.id = id
-					data.messages = this.data[this.getIndex()].messages
-					$nextTick(()=>{
-						autoScroll()
-						highlightElement()
+				listenHashChange(store, data, $nextTick){
+					window.addEventListener("hashchange", () => {
+						var hash = getLocationHash();
+						this.setIdByHash(hash)
+						data.messages = this.data[this.getIndex()].messages
+						$nextTick(()=>{
+							autoScroll()
+							highlightElement()
+						})
 					})
+				},
+				changeRole(store, data, $nextTick ,id){
+				
+					window.location.hash = "#roles-"+id;
+					
 				},
 				getIndex(id){
 					var index = this.data.indexOf(this.data.find((item) => {
@@ -352,7 +361,7 @@
 					this.role.name = ''
 					this.role.prompt = ''
 					store.code.toggle()
-
+					this.changeRole(store, data, $nextTick, this.role.id)
 				},
 				maxId(){
 					let maxId = -Infinity; // 定义一个变量用于存储最大id的值，初始值设为负无穷
@@ -397,6 +406,7 @@
 
 		var max_message = 20
 		function init(store, data, $nextTick) {
+			store.roles.listenHashChange(store, data, $nextTick)
 			store.roles.resumeLocalRoles(store, data)
 			store.roles.resumeRolesMessages(store, data)
 			send(store, data, $nextTick)
