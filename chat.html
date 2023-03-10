@@ -82,10 +82,11 @@
 	
 						<div class="w-full" :class="disabled ? '' : 'hidden'">
 							<div class="flex w-full mt-2 space-x-3 overflow-auto" >
-								<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
+								<!-- <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div> -->
 								<div class="w-full">
 									<div class="p-3 rounded-r-lg rounded-bl-lg" id="messages-stream">
 										<div  x-html="markedParse(content)" class="prose"></div>
+										<span class="inline-block w-2 h-4 bg-gray-500 rounded animate-pulse"></span>
 									</div>
 									<span class="text-xs text-gray-500 leading-none"></span>
 								</div>
