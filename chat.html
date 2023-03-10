@@ -462,7 +462,7 @@
 				data.disabled = false
 				return ;
 			}
-
+			data.messages = store.roles.data[store.roles.getIndex()].messages
 			data.messages.push({
 				is_self: true,
 				content: data.message,
