@@ -41,12 +41,16 @@
 				  <template x-for="role,index in $store.roles.data">
 					<li class="p-4">
 						<a x-bind:href="'#roles-'+role.id" class="font-medium hover:text-indigo-500" :class="[$store.roles.id == role.id ? 'text-indigo-600' : '']" x-text="role.name" @click="open_menu=false;$store.roles.changeRole($store,$data,$nextTick,role.id)">
-						  
 						</a>
+						<template x-if="role.is_can_delete">
+							<button class="w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-md text-sm" @click="open_menu=false;$store.code.code=$refs.role_delete.innerHTML;$store.code.toggle();$store.roles.delete_id=role.id">
+								-
+							</button>
+						</template>
 					  </li>
 				  </template>
 				  <li class="p-4 flex justify-center items-center">						
-					<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @click="open_menu=false;$store.code.code=$refs.form.innerHTML;$store.code.toggle()">
+					<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold w-6 h-6 rounded text-xs" @click="open_menu=false;$store.code.code=$refs.form.innerHTML;$store.code.toggle()">
 					+
 					</button>
 				</li>
@@ -139,6 +143,15 @@
 							</div>
 						  </form>
 					</div>
+					<div class="hidden" x-ref="role_delete">
+						<div class="bg-white p-4 rounded shadow-lg">
+							<p class="mb-4">确认删除该内容？</p>
+							<div class="flex justify-end">
+								<button class="px-4 py-2 bg-gray-400 text-white rounded mr-2" @click="$store.code.toggle()">取消</button>
+								<button class="px-4 py-2 bg-red-500 text-white rounded" @click="$store.roles.deleteRole($store, $data, $nextTick ,$store.roles.delete_id)">删除</button>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -212,7 +225,7 @@
 			Alpine.store('roles', {
 				role: {
 					id: 0,
-					is_local: true,
+					is_can_delete: true,
 					name: '',
 					messages: [],
 					prompt: '',
@@ -221,7 +234,7 @@
 				data: [
 					{
 						id: 1,
-						is_local: false,
+						is_can_delete: false,
 						name: '随便聊聊',
 						messages: [],
 						prompt: '',
@@ -229,7 +242,7 @@
 					},
 					{
 						id: 2,
-						is_local: false,
+						is_can_delete: false,
 						name: '作为英语翻译和改进者',
 						messages: [],
 						prompt: 'I want you to act as an English translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in English. I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, upper level English words and sentences. Keep the meaning same, but make them more literary. I want you to only reply the correction, the improvements and nothing else, do not write explanations. My first sentence is "{prompt}"',
@@ -237,7 +250,7 @@
 					},
 					{
 						id: 3,
-						is_local: false,
+						is_can_delete: false,
 						name: '作为中文翻译和改进者',
 						messages: [],
 						prompt: 'I want you to act as an Chinese translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in Chinese. I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, upper level Chinese words and sentences. Keep the meaning same, but make them more literary. I want you to only reply the correction, the improvements and nothing else, do not write explanations. My first sentence is "{prompt}"',
@@ -245,7 +258,7 @@
 					},
 					{
 						id: 10,
-						is_local: false,
+						is_can_delete: false,
 						name: '作为 Linux 终端',
 						messages: [],
 						prompt: 'I want you to act as a linux terminal. I will type commands and you will reply with what the terminal should show. I want you to only reply with the terminal output inside one unique code block, and nothing else. do not write explanations. do not type commands unless I instruct you to do so. When I need to tell you something in English, I will do so by putting text inside curly brackets {like this}. My first command is {prompt}',
@@ -253,7 +266,7 @@
 					},
 					{
 						id: 11,
-						is_local: false,
+						is_can_delete: false,
 						name: '作为 JavaScript 控制台',
 						messages: [],
 						prompt: 'I want you to act as a javascript console. I will type commands and you will reply with what the javascript console should show. I want you to only reply with the terminal output inside one unique code block, and nothing else. do not write explanations. do not type commands unless I instruct you to do so. when I need to tell you something in english, I will do so by putting text inside curly brackets {like this}. My first command is {prompt};',
@@ -261,7 +274,7 @@
 					},
 					{
 						id: 12,
-						is_local: false,
+						is_can_delete: false,
 						name: '作为 PHP 解释器',
 						messages: [],
 						prompt: 'I want you to act like a php interpreter. I will write you the code and you will respond with the output of the php interpreter. I want you to only reply with the terminal output inside one unique code block, and nothing else. do not write explanations. Do not type commands unless I instruct you to do so. When i need to tell you something in english, i will do so by putting text inside curly brackets {like this}. My first command is <?php {prompt}',
@@ -269,7 +282,8 @@
 					},
 				],
 				id: 1,
-				listenHashChange(store, data, $nextTick){
+				delete_id: 0,
+				initListenHashChange(store, data, $nextTick){
 					window.addEventListener("hashchange", () => {
 						var hash = getLocationHash();
 						this.setIdByHash(hash)
@@ -284,6 +298,12 @@
 				
 					window.location.hash = "#roles-"+id;
 					
+				},
+				deleteRole(store, data, $nextTick ,id){
+					this.deleteDataById(id)
+					this.deleteLocalRoles(id)
+					window.location.hash = "#roles-1";
+					store.code.toggle()
 				},
 				getIndex(id){
 					var index = this.data.indexOf(this.data.find((item) => {
@@ -320,20 +340,17 @@
 					}
 					return message
 				},
-				// 本地添加的角色
-				resumeLocalRoles(store, data) {
-					store.roles.setIdByHash(getLocationHash())
-					if (localStorage.getItem('local_roles')) {
-						var local_roles = JSON.parse(localStorage.getItem('local_roles'))
-						store.roles.data.push(...local_roles)
-					}
+				deleteDataById(id){
+					this.data = this.data.filter(item=>{
+						return item.id != id
+					})
 				},
 				setRolesMessages(store, data) {
 					store.roles.data[store.roles.getIndex()].messages = JSON.parse(JSON.stringify(store.roles.data[store.roles.getIndex()].messages)).slice(-max_message)
 					data.messages = store.roles.data[store.roles.getIndex()].messages
 					localStorage.setItem('roles_data', JSON.stringify(store.roles.data))
 				},
-				resumeRolesMessages(store, data) {
+				initResumeRolesMessages(store, data) {
 					store.roles.setIdByHash(getLocationHash())
 					if (localStorage.getItem('roles_data')) {
 						var roles_data = JSON.parse(localStorage.getItem('roles_data'))
@@ -374,6 +391,21 @@
 
 					return maxId
 				},
+				// 本地添加的角色
+				initResumeLocalRoles(store, data) {
+					store.roles.setIdByHash(getLocationHash())
+					if (localStorage.getItem('local_roles')) {
+						var local_roles = JSON.parse(localStorage.getItem('local_roles'))
+						store.roles.data.push(...local_roles)
+					}
+				},
+				deleteLocalRoles(id){
+					var local_roles = this.getLocalRoles()
+					local_roles = local_roles.filter(item=>{
+						return item.id !=id
+					})
+					this.setLocalRoles(local_roles)
+				},
 				getLocalRoles(){
 					return JSON.parse(localStorage.getItem('local_roles') || '[]')  
 				},
@@ -406,9 +438,9 @@
 
 		var max_message = 20
 		function init(store, data, $nextTick) {
-			store.roles.listenHashChange(store, data, $nextTick)
-			store.roles.resumeLocalRoles(store, data)
-			store.roles.resumeRolesMessages(store, data)
+			store.roles.initListenHashChange(store, data, $nextTick)
+			store.roles.initResumeLocalRoles(store, data)
+			store.roles.initResumeRolesMessages(store, data)
 			send(store, data, $nextTick)
 		}
 		function send(store, data, $nextTick) {
