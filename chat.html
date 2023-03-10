@@ -235,7 +235,7 @@
 					{
 						id: 1,
 						is_can_delete: false,
-						name: '随便聊聊',
+						name: 'Chat',
 						messages: [],
 						prompt: '',
 						default: ''
@@ -402,6 +402,7 @@
 						var local_roles = JSON.parse(localStorage.getItem('local_roles'))
 						store.roles.data.push(...local_roles)
 					}
+					this.setTitle()
 				},
 				deleteLocalRoles(id){
 					var local_roles = this.getLocalRoles()
