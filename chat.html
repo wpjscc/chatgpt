@@ -45,6 +45,11 @@
 						</a>
 					  </li>
 				  </template>
+				  <li class="p-4 flex justify-center items-center">						
+					<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @click="open_menu=false;$store.code.code=$refs.form.innerHTML;$store.code.toggle()">
+					+
+					</button>
+				</li>
 				</ul>
 			</div>
 			<div class="flex-grow w-full" @click="open_menu=false">
@@ -112,6 +117,27 @@
 								
 						</div>
 						</div>
+					</div>
+					<div class="hidden" x-ref="form">
+						<form class="bg-gray-100 p-6 rounded-lg">
+							<div class="mb-4">
+							  <label class="block text-gray-700 font-bold mb-2" for="username">
+								角色名称
+							  </label>
+							  <input class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" x-model="$store.roles.role.name" type="text" placeholder="请输入角色名称">
+							</div>
+							<div class="mb-4">
+							  <label class="block text-gray-700 font-bold mb-2" for="prompt">
+								prompt
+							  </label>
+							  <textarea class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" x-model="$store.roles.role.prompt"  rows="5" placeholder="请输入prompt (必须包含{prompt})"></textarea>
+							</div>
+							<div class="flex justify-end">
+							  <p class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer" @click="$store.roles.addRole($store,$data,$nextTick)">
+								添加
+							  </p>
+							</div>
+						  </form>
 					</div>
 				</div>
 			</div>
@@ -183,9 +209,18 @@
 				}
 			})
 			Alpine.store('roles', {
+				role: {
+					id: 0,
+					is_local: true,
+					name: '',
+					messages: [],
+					prompt: '',
+					default: ''
+				},
 				data: [
 					{
 						id: 1,
+						is_local: false,
 						name: '随便聊聊',
 						messages: [],
 						prompt: '',
@@ -193,6 +228,7 @@
 					},
 					{
 						id: 2,
+						is_local: false,
 						name: '作为英语翻译和改进者',
 						messages: [],
 						prompt: 'I want you to act as an English translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in English. I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, upper level English words and sentences. Keep the meaning same, but make them more literary. I want you to only reply the correction, the improvements and nothing else, do not write explanations. My first sentence is "{prompt}"',
@@ -200,6 +236,7 @@
 					},
 					{
 						id: 3,
+						is_local: false,
 						name: '作为中文翻译和改进者',
 						messages: [],
 						prompt: 'I want you to act as an Chinese translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in Chinese. I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, upper level Chinese words and sentences. Keep the meaning same, but make them more literary. I want you to only reply the correction, the improvements and nothing else, do not write explanations. My first sentence is "{prompt}"',
@@ -207,6 +244,7 @@
 					},
 					{
 						id: 10,
+						is_local: false,
 						name: '作为 Linux 终端',
 						messages: [],
 						prompt: 'I want you to act as a linux terminal. I will type commands and you will reply with what the terminal should show. I want you to only reply with the terminal output inside one unique code block, and nothing else. do not write explanations. do not type commands unless I instruct you to do so. When I need to tell you something in English, I will do so by putting text inside curly brackets {like this}. My first command is {prompt}',
@@ -214,6 +252,7 @@
 					},
 					{
 						id: 11,
+						is_local: false,
 						name: '作为 JavaScript 控制台',
 						messages: [],
 						prompt: 'I want you to act as a javascript console. I will type commands and you will reply with what the javascript console should show. I want you to only reply with the terminal output inside one unique code block, and nothing else. do not write explanations. do not type commands unless I instruct you to do so. when I need to tell you something in english, I will do so by putting text inside curly brackets {like this}. My first command is {prompt};',
@@ -221,6 +260,7 @@
 					},
 					{
 						id: 12,
+						is_local: false,
 						name: '作为 PHP 解释器',
 						messages: [],
 						prompt: 'I want you to act like a php interpreter. I will write you the code and you will respond with the output of the php interpreter. I want you to only reply with the terminal output inside one unique code block, and nothing else. do not write explanations. Do not type commands unless I instruct you to do so. When i need to tell you something in english, i will do so by putting text inside curly brackets {like this}. My first command is <?php {prompt}',
@@ -270,6 +310,72 @@
 						return this.data[this.getIndex()].prompt.replace('{prompt}', message)
 					}
 					return message
+				},
+				// 本地添加的角色
+				resumeLocalRoles(store, data) {
+					store.roles.setIdByHash(getLocationHash())
+					if (localStorage.getItem('local_roles')) {
+						var local_roles = JSON.parse(localStorage.getItem('local_roles'))
+						store.roles.data.push(...local_roles)
+					}
+				},
+				setRolesMessages(store, data) {
+					store.roles.data[store.roles.getIndex()].messages = JSON.parse(JSON.stringify(store.roles.data[store.roles.getIndex()].messages)).slice(-max_message)
+					data.messages = store.roles.data[store.roles.getIndex()].messages
+					localStorage.setItem('roles_data', JSON.stringify(store.roles.data))
+				},
+				resumeRolesMessages(store, data) {
+					store.roles.setIdByHash(getLocationHash())
+					if (localStorage.getItem('roles_data')) {
+						var roles_data = JSON.parse(localStorage.getItem('roles_data'))
+						for (const element of roles_data) {
+							store.roles.data[store.roles.getIndex(element.id)].messages = element.messages
+						}
+						data.messages =  store.roles.data[store.roles.getIndex()].messages
+					}
+				},
+				addRole(store, data, $nextTick) {
+					var name = this.role.name
+					var prompt = this.role.prompt
+					if (!name || !prompt) {
+						alert('数据不完整')
+						return 
+					}
+					if (!prompt.includes('{prompt}')) {
+						alert('必须包含占位符{prompt}')
+						return 
+					}
+					this.role.id = this.maxId() + 10000;
+					var role = JSON.parse(JSON.stringify(this.role))
+
+					this.addLocalRole(role)
+					this.role.name = ''
+					this.role.prompt = ''
+					store.code.toggle()
+
+				},
+				maxId(){
+					let maxId = -Infinity; // 定义一个变量用于存储最大id的值，初始值设为负无穷
+
+					for (let i = 0; i < this.data.length; i++) { // 遍历二维数组的每个元素
+						if (this.data[i].id > maxId) { // 如果该对象的id比maxId大
+							maxId = this.data[i].id; // 更新maxId的值
+						}
+					}
+
+					return maxId
+				},
+				getLocalRoles(){
+					return JSON.parse(localStorage.getItem('local_roles') || '[]')  
+				},
+				setLocalRoles(roles){
+					localStorage.setItem('local_roles', JSON.stringify(roles))  
+				},
+				addLocalRole(role){
+					var roles = this.getLocalRoles()
+					roles.push(role)
+					this.data.push(role)
+					this.setLocalRoles(roles)
 				}
 			})
 			Alpine.data('data', () => {
@@ -291,7 +397,8 @@
 
 		var max_message = 20
 		function init(store, data, $nextTick) {
-			resumeLocalRoles(store, data)
+			store.roles.resumeLocalRoles(store, data)
+			store.roles.resumeRolesMessages(store, data)
 			send(store, data, $nextTick)
 		}
 		function send(store, data, $nextTick) {
@@ -338,7 +445,7 @@
 					})
 					data.disabled = false;
 					data.content = ''
-					setLocalRoles(store, data)
+					store.roles.setRolesMessages(store, data)
 					if ($nextTick) {
 						$nextTick(()=>{
 							autoScroll()
@@ -364,7 +471,7 @@
 						content: data.content,
 						time_at: new Date().Format("yyyy-MM-dd hh:mm:ss")
 					})
-					setLocalRoles(store, data)
+					store.roles.setRolesMessages(store, data)
 				}
 				eventSource.close()
 				data.disabled = false
@@ -408,22 +515,6 @@
 		
 		}
 
-		function setLocalRoles(store, data) {
-			store.roles.data[store.roles.getIndex()].messages = JSON.parse(JSON.stringify(store.roles.data[store.roles.getIndex()].messages)).slice(-max_message)
-			data.messages = store.roles.data[store.roles.getIndex()].messages
-			localStorage.setItem('roles', JSON.stringify(store.roles.data))
-		}
-		
-		function resumeLocalRoles(store, data) {
-			store.roles.setIdByHash(getLocationHash())
-			if (localStorage.getItem('roles')) {
-				var roles = JSON.parse(localStorage.getItem('roles'))
-				for (const element of roles) {
-					store.roles.data[store.roles.getIndex(element.id)].messages = element.messages
-				}
-				data.messages =  store.roles.data[store.roles.getIndex()].messages
-			}
-		}
 
 		function markedParse(content) {
 			var md = window.markdownit();
