@@ -26,7 +26,7 @@
 </head>
 <body class="flex flex-col items-center justify-center w-screen min-h-screen bg-gray-100 text-gray-800" x-data="data" x-init="init($store, $data, $nextTick)">
 
-		<div class="flex w-full max-w-5xl">
+		<div class="flex w-full max-w-screen-2xl">
 			<!-- 移动设备展开侧边栏按钮 -->
 			<div class="md:hidden absolute z-10">
 				<button class="focus:outline-none" @click="open_menu = !open_menu">
@@ -58,12 +58,12 @@
 			</div>
 			<div class="flex-grow w-full" @click="open_menu=false">
 				<!-- Component Start -->
-				<div class="flex flex-col flex-grow w-full max-w-4xl bg-white shadow-xl rounded-lg overflow-hidden min-h-screen relative">
+				<div class="flex flex-col flex-grow w-full  bg-white shadow-xl rounded-lg overflow-hidden min-h-screen relative">
 					<div class="flex flex-col flex-grow h-0 p-4 overflow-auto" id="messages" x-ref="scrollDiv" @scroll="$refs.scrollDiv.scrollTop < 200 ? $refs.buttonTop.classList.add('hidden') :  $refs.buttonTop.classList.remove('hidden')">
 						<template x-for="msg in messages">
 							<div class="w-full">
 								<template x-if="msg.is_self">
-									<div class="flex w-full mt-2 space-x-3 max-w-xs ml-auto justify-end ">
+									<div class="flex w-full mt-2 space-x-3 ml-auto justify-end ">
 										<div>
 											<div class="bg-blue-600 text-white p-3 rounded-l-lg rounded-br-lg ">
 												<p class="text-sm" x-text="msg.content"></p>
@@ -78,7 +78,7 @@
 										<!-- <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div> -->
 										<div class="w-full">
 											<div class="p-3 rounded-r-lg rounded-bl-lg">
-												<div  x-html="markedParse(msg.content)" class="prose"></div>
+												<div  x-html="markedParse(msg.content)" class="prose md:max-w-4xl"></div>
 											</div>
 											<span class="text-xs text-gray-500 leading-none" x-text="msg.time_at"></span>
 										</div>
@@ -94,7 +94,7 @@
 								<!-- <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div> -->
 								<div class="w-full">
 									<div class="p-3 rounded-r-lg rounded-bl-lg" id="messages-stream">
-										<div  x-html="markedParse(content)" class="prose"></div>
+										<div  x-html="markedParse(content)" class="prose md:max-w-4xl"></div>
 										<span class="inline-block w-2 h-4 bg-gray-500 rounded animate-pulse"></span>
 									</div>
 									<span class="text-xs text-gray-500 leading-none"></span>
