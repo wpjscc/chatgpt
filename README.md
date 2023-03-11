@@ -9,7 +9,8 @@
 * 可自定义token（会优先使用url上带着的token）
 * 支持代理
 * 支持自定义角色
-
+  * https://github.com/f/awesome-chatgpt-prompts#act-as-a-linux-terminal 
+  
 ## install
 
 
