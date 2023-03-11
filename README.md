@@ -62,4 +62,6 @@ https://chatgpt.xiaofuwu.wpjs.cc
 ## 自定义role
 
 ![image](https://user-images.githubusercontent.com/76907477/224470027-6dd9c9f4-b6ba-4976-875e-8c51f725a37b.png)
+![image](https://user-images.githubusercontent.com/76907477/224470088-f9977000-bd12-4093-93ef-4e89669da1dd.png)
+
 
