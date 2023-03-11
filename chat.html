@@ -134,7 +134,7 @@
 							  <label class="block text-gray-700 font-bold mb-2" for="prompt">
 								prompt
 							  </label>
-							  <textarea class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" x-model="$store.roles.role.prompt"  rows="5" placeholder="请输入prompt (必须包含{prompt})"></textarea>
+							  <textarea class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" x-model="$store.roles.role.prompt"  rows="5" placeholder="(必须包含{prompt} 例子：【I want you to act as a linux terminal. I will type commands and you will reply with what the terminal should show. I want you to only reply with the terminal output inside one unique code block, and nothing else. do not write explanations. do not type commands unless I instruct you to do so. When I need to tell you something in English, I will do so by putting text inside curly brackets {like this}. My first command is {prompt}】"></textarea>
 							</div>
 							<div class="flex justify-end">
 							  <p class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer" @click="$store.roles.addRole($store,$data,$nextTick)">
