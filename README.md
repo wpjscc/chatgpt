@@ -59,6 +59,7 @@ http://127.0.0.1:8080?token=xxxxxx
 https://chatgpt.xiaofuwu.wpjs.cc
 
 
-## example
+## 自定义role
 
-![./example.png](./example.png)
+![image](https://user-images.githubusercontent.com/76907477/224470027-6dd9c9f4-b6ba-4976-875e-8c51f725a37b.png)
+
