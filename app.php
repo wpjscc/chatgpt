@@ -19,7 +19,7 @@ function (Psr\Http\Message\ServerRequestInterface $request) {
         ));
     }
 
-    $client = (new \React\Http\Browser($connector))->withTimeout(10.0);
+    $client = (new \React\Http\Browser($connector))->withTimeout(getParam('--timeout', 10));
     $params = $request->getQueryParams();
     $query = $params['query'] ?? '';
     $token = $params['token'] ?? (getParam('--token') ?: '');
@@ -165,13 +165,13 @@ function getData($msg){
     ]])."\n\n";  
 }
 
-function getParam($key){
+function getParam($key, $default = null){
     foreach ($GLOBALS['argv'] as $arg) {
         if (strpos($arg, $key) !==false){
             return explode('=', $arg)[1];
         }
     }
-    return ;
+    return $default;
 }
 
 $socket = new React\Socket\SocketServer('0.0.0.0:'.(getParam('--port') ?: '8000'));
