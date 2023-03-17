@@ -174,21 +174,7 @@
 			button.innerHTML = 'Preview';
 
 			button.addEventListener('click', function () {
-
-				if (document.body.createTextRange) { // ms
-					var range = document.body.createTextRange();
-					range.moveToElementText(env.element);
-					range.select();
-
-
-				} else if (window.getSelection) { // moz, opera, webkit
-					var selection = window.getSelection();
-					var range = document.createRange();
-					range.selectNodeContents(env.element);
-					selection.removeAllRanges();
-					selection.addRange(range);
-				}
-				Alpine.store('code').code = getSelectedText()
+				Alpine.store('code').code = env.element.innerText
 				Alpine.store('code').toggle()
 			});
 

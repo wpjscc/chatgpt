@@ -36,27 +36,22 @@ function (Psr\Http\Message\ServerRequestInterface $request) {
     }
     var_dump($path);
 
-    if (in_array($path, ['/assets/tailwindcss.js', '/assets/alpinejs.js', '/assets/markdown-it.min.js' ,'/assets/prism.js', '/assets/prism-treeview.js'])) {
-        return new React\Http\Message\Response(
-            React\Http\Message\Response::STATUS_OK,
-            array(
-                'Content-Type' => 'application/javascript',
-                'Cache-Control' => 'max-age=3600'
-            ),
-            file_get_contents(__DIR__.$path)
-        );
-    }
-    
-    if (in_array($path, ['/assets/prism.css', '/assets/prism-light.css'])) {
-        var_dump('exist:css:'. $path);
-        return new React\Http\Message\Response(
-            React\Http\Message\Response::STATUS_OK,
-            array(
-                'Content-Type' => 'text/css',
-                'Cache-Control' => 'max-age=3600'
-            ),
-            file_get_contents(__DIR__.$path)
-        );
+    if (strpos($path, "/assets") === 0) {
+        if (file_exists(__DIR__.$path)) {
+            $fileType = getFileType(__DIR__.$path);
+            $contentType = 'application/javascript';
+            if ($fileType == 'css') {
+                $contentType = 'text/css';
+            }
+            return new React\Http\Message\Response(
+                React\Http\Message\Response::STATUS_OK,
+                array(
+                    'Content-Type' => $contentType,
+                    'Cache-Control' => 'max-age=3600'
+                ),
+                file_get_contents(__DIR__.$path)
+            );
+        }
     }
 
     $stream = new ThroughStream();
@@ -172,6 +167,17 @@ function getParam($key, $default = null){
         }
     }
     return $default;
+}
+
+function getFileType($filename) {
+    $ext = pathinfo($filename, PATHINFO_EXTENSION);
+    if ($ext == 'css') {
+        return 'css';
+    } elseif ($ext == 'js') {
+        return 'js';
+    } else {
+        return '';
+    }
 }
 
 $socket = new React\Socket\SocketServer('0.0.0.0:'.(getParam('--port') ?: '8000'));
