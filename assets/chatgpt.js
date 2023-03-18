@@ -3,10 +3,9 @@ document.addEventListener('DOMContentLoaded', function() {
         var start_x, start_y
         var width = 400
         var height = 720
+        var frame_height = 675
+        var chat_href = 'https://chatgpt.xiaofiwu.wpjs.cc/?is_hidden_left=1'
 
-        if (isMobile()) {
-            height = window.innerHeight
-        }
         var style = document.createElement('style');
         style.type = 'text/css';
         style.innerHTML = `.info-xxx-box {
@@ -38,8 +37,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var id = randomString(10)
 
-        bottom_div.addEventListener("click", function() {
-            toggleElementVisibility(id)
+        bottom_div.addEventListener("click", function () {
+            if (isMobile()) {
+                window.location.href = chat_href
+            } else {
+                toggleElementVisibility(id)
+            }
         });
         
         
@@ -58,9 +61,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const h4 = document.createElement('h4')
         h4.innerText = 'Chatgpt'
         h4.style.textAlign = 'center'
-        if (!isMobile()) { 
-            div.appendChild(h4)
-        }
 
         window.addEventListener('resize', function(){
             div.style.left = (window.innerWidth/2-width/2) + 'px'
@@ -70,14 +70,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const iframe = document.createElement('iframe')
         iframe.width = width; // iframe 的宽度
-        iframe.height = 667; // iframe 的高度
+        iframe.height = frame_height; // iframe 的高度
         iframe.id = id + 'iframe';
         iframe.style.border = 'none'
-        iframe.src="https://chatgpt.xiaofuwu.wpjs.cc?is_hidden_left=1"
+        iframe.src=chat_href
         div.appendChild(iframe)
         document.body.appendChild(div);
 
         addListeners()
+
+        window.addEventListener('resize', function(){
+            div.style.left = (window.innerWidth/2-width/2) + 'px'
+            div.style.top = (window.innerHeight / 2 - height / 2) + 'px'
+        });
+
         function randomString(length=10) {
             var result = "";
             var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
