@@ -11,8 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
         style.type = 'text/css';
         style.innerHTML = `.info-xxx-box {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 120px;
+            right: 10px;
             background-color: #fff;
             border: 1px solid #ccc;
             padding-left: 10px;
