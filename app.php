@@ -47,7 +47,7 @@ function (Psr\Http\Message\ServerRequestInterface $request) {
                 React\Http\Message\Response::STATUS_OK,
                 array(
                     'Content-Type' => $contentType,
-                    // 'Cache-Control' => 'max-age=3600'
+                    'Cache-Control' => 'max-age=3600'
                 ),
                 file_get_contents(__DIR__.$path)
             );
