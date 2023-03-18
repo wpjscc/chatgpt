@@ -3,6 +3,10 @@ document.addEventListener('DOMContentLoaded', function() {
         var start_x, start_y
         var width = 400
         var height = 720
+
+        if (isMobile()) {
+            height = window.innerHeight
+        }
         var style = document.createElement('style');
         style.type = 'text/css';
         style.innerHTML = `.info-xxx-box {
@@ -54,18 +58,21 @@ document.addEventListener('DOMContentLoaded', function() {
         const h4 = document.createElement('h4')
         h4.innerText = 'Chatgpt'
         h4.style.textAlign = 'center'
-        div.appendChild(h4)
+        if (!isMobile()) { 
+            div.appendChild(h4)
+        }
 
         window.addEventListener('resize', function(){
             div.style.left = (window.innerWidth/2-width/2) + 'px'
-            div.style.top = (window.innerHeight/2-height/2) + 'px'
+            div.style.top = (window.innerHeight / 2 - height / 2) + 'px'
         });
 
 
         const iframe = document.createElement('iframe')
         iframe.width = width; // iframe 的宽度
-        iframe.height = '675'; // iframe 的高度
-        iframe.style.border = 'none';
+        iframe.height = 667; // iframe 的高度
+        iframe.id = id + 'iframe';
+        iframe.style.border = 'none'
         iframe.src="https://chatgpt.xiaofuwu.wpjs.cc?is_hidden_left=1"
         div.appendChild(iframe)
         document.body.appendChild(div);
@@ -109,6 +116,9 @@ document.addEventListener('DOMContentLoaded', function() {
             div.style.position = 'fixed';
             div.style.top = (e.clientY-start_y) + 'px';
             div.style.left = (e.clientX-start_x) + 'px';
+        }
+        function isMobile() {
+            return window.innerWidth <= 768;
         }
         function toggleElementVisibility(elementId) {
             var element = document.getElementById(elementId);
