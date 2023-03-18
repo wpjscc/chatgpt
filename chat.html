@@ -33,7 +33,7 @@
 
 		<div class="flex w-full max-w-screen-2xl">
 			<!-- 移动设备展开侧边栏按钮 -->
-			<div class="md:hidden absolute z-10" x-clock>
+			<div class="md:hidden absolute z-10" x-clock id="left-menu-toggle">
 				<button class="focus:outline-none" @click="open_menu = !open_menu">
 					<svg fill="currentColor" viewBox="0 0 20 20" class="w-6 h-6">
 					<path x-show="!open_menu" fill-rule="evenodd" clip-rule="evenodd" d="M3 6h14v2H3V6zm0 5h14v2H3v-2zm0 5h14v2H3v-2z"></path>
@@ -196,6 +196,7 @@
 		document.addEventListener('DOMContentLoaded', function() {
 			document.getElementById('preview').classList.remove('hidden')
 			if (getQueryVariable('is_hidden_left')) {
+				document.getElementById('left-menu-toggle').style.display = 'none'
 				document.getElementById('left-menu').style.display = 'none'
 			}
 		});
