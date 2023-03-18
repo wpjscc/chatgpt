@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var height = 720
         var frame_height = 675
         var chat_href = 'https://chatgpt.xiaofiwu.wpjs.cc/?is_hidden_left=1'
+        var chat_href = 'http://10.8.0.9:8080/?is_hidden_left=1'
 
         var style = document.createElement('style');
         style.type = 'text/css';
@@ -28,8 +29,27 @@ document.addEventListener('DOMContentLoaded', function() {
             border-width: 10px;
             border-style: solid;
             border-color: transparent transparent #fff transparent;
-          }`;
+          }
+          .popup-xxx-shadow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 998;
+            background-color: rgba(0, 0, 0, 0.5);
+          }
+          `;
         document.head.appendChild(style);
+        const shadow = document.createElement('div')
+        var shadow_id = randomString(10)
+
+        shadow.classList.add('popup-xxx-shadow')
+        shadow.id = shadow_id
+        shadow.style.display = 'none'
+        document.body.appendChild(shadow);
+
+
         const bottom_div = document.createElement('div')
         bottom_div.classList.add('info-xxx-box')
         bottom_div.innerHTML = `Chatgpt`
@@ -42,8 +62,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.href = chat_href
             } else {
                 toggleElementVisibility(id)
+                toggleElementVisibility(shadow_id)
             }
         });
+        shadow.addEventListener("click", function () {
+          
+            toggleElementVisibility(id)
+            toggleElementVisibility(shadow_id)
+
+        })
         
         
         const div = document.createElement('div')
@@ -56,7 +83,8 @@ document.addEventListener('DOMContentLoaded', function() {
         div.style.cursor = 'move'
         div.style.width = width+'px'; 
         div.style.maxHeight = height+'px';
-        div.style.backgroundColor='rgb(209 213 219)'
+        div.style.backgroundColor = 'rgb(209 213 219)'
+        div.style.zIndex = 9999
 
         const h4 = document.createElement('h4')
         h4.innerText = 'Chatgpt'
