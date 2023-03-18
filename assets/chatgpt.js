@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function() {
         var height = 720
         var frame_height = 675
         var chat_href = 'https://chatgpt.xiaofiwu.wpjs.cc/?is_hidden_left=1'
-        var chat_href = 'http://10.8.0.9:8080/?is_hidden_left=1'
 
         var style = document.createElement('style');
         style.type = 'text/css';
