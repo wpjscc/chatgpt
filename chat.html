@@ -108,20 +108,21 @@
 						</div>
 					</div>
 					
-					<div class="bg-gray-300 p-4 flex" x-data="{ ctrlPressed: false }">
-						<!-- <input class="flex items-center h-10 w-full rounded px-3 text-sm" type="text" x-bind:placeholder="placeholder" x-model="message" @keyup.enter="send($store,$data)" x-bind:disabled="disabled"> -->
-						<textarea class="flex-1 border border-gray-300 rounded-lg py-2 px-4" x-bind:placeholder="placeholder" 
-						@keydown.ctrl="ctrlPressed = true"
-						@keyup.ctrl="ctrlPressed = false" 
+					<div class="bg-gray-300 p-4 flex" x-data="{ shiftPressed: false }">
+						<input class="flex items-center h-10 w-full rounded px-3 text-sm block md:hidden" type="text" x-bind:placeholder="placeholder" x-model="message" @keyup.enter="send($store,$data)" x-bind:disabled="disabled">
+						<textarea class="flex-1 border border-gray-300 rounded-lg py-2 px-4 hidden md:block" x-bind:placeholder="placeholder" 
+						@keydown.shift="shiftPressed = true"
+						@keyup.shift="shiftPressed = false" 
 						x-model="message"
+						x-bind:disabled="disabled"
 						@keyup.enter.prevent="
-						if (ctrlPressed) {
+						if (shiftPressed) {
 							message+='\n'
 						} else {
 							send($store,$data)
 						}
 						"></textarea>
-    					<button class="flex-shrink-0  w-20 h-16 ml-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg" @click="send($store,$data)">Send</button>
+    					<button class="flex-shrink-0  w-20  h-10 md:h-16 ml-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg disabled:bg-gray-500" x-bind:disabled="disabled" @click="send($store,$data)">Send</button>
 					</div>
 					<!-- Scroll to top button -->
 					<button class="absolute bottom-20 -right-1  text-white font-bold py-2 px-4 rounded hidden"  x-ref="buttonTop" @click="$refs.scrollDiv.scrollTop=0">
@@ -471,16 +472,9 @@
 			store.roles.initResumeRolesMessages(store, data)
 			send(store, data, $nextTick)
 		}
-		function isInputtingChinese() {
-			// 获取当前输入法是否处于选词状态
-			// 可以通过监听compositionstart和compositionend事件实现
-			// 这里简化为判断是否存在"Composition"字符串
-			return document.activeElement.value.indexOf("Composition") > -1;
-		}
+
 		function send(store, data, $nextTick, $e) {
-			if (isInputtingChinese()) {
-				return ;
-			}
+
 			if ($nextTick) {
 				$nextTick(()=>{
 					autoScroll()
