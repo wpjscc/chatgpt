@@ -110,7 +110,7 @@
 					
 					<div class="bg-gray-300 p-4 flex" x-data="{ shiftPressed: false }">
 						<input class="flex items-center h-10 w-full rounded px-3 text-sm block md:hidden" type="text" x-bind:placeholder="placeholder" x-model="message" @keyup.enter="send($store,$data)" x-bind:disabled="disabled">
-						<textarea class="flex-1 border border-gray-300 rounded-lg py-2 px-4 hidden md:block" x-bind:placeholder="placeholder" 
+						<textarea class="flex-1 border border-gray-300 rounded-lg py-2 px-4 hidden md:block disabled:bg-gray-200" x-bind:placeholder="placeholder" 
 						@keydown.shift="shiftPressed = true"
 						@keyup.shift="shiftPressed = false" 
 						x-model="message"
