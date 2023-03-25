@@ -108,21 +108,23 @@
 						</div>
 					</div>
 					
-					<div class="bg-gray-300 p-4 flex" x-data="{ shiftPressed: false }">
-						<input class="flex items-center h-10 w-full rounded px-3 text-sm block md:hidden" type="text" x-bind:placeholder="placeholder" x-model="message" @keyup.enter="send($store,$data)" x-bind:disabled="disabled">
-						<textarea class="flex-1 border border-gray-300 rounded-lg py-2 px-4 hidden md:block disabled:bg-gray-200" x-bind:placeholder="placeholder" 
+					<div class="bg-gray-300 p-4 flex" x-data="{ shiftPressed: false, ctrlPressed: false }">
+						<input class="flex items-center h-10 w-full rounded px-3 text-sm block sm:hidden disabled:bg-gray-200" type="text" x-bind:placeholder="placeholder" x-model="message" @keyup.enter="send($store,$data)" x-bind:disabled="disabled">
+						<textarea class="flex-1 border border-gray-300 rounded-lg py-2 px-4 hidden sm:block disabled:bg-gray-200" x-bind:placeholder="placeholder" 
 						@keydown.shift="shiftPressed = true"
 						@keyup.shift="shiftPressed = false" 
+						@keydown.ctrl="ctrlPressed = true"
+						@keydown.ctrl="ctrlPressed = false"
 						x-model="message"
 						x-bind:disabled="disabled"
 						@keyup.enter.prevent="
-						if (shiftPressed) {
+						if (shiftPressed || ctrlPressed) {
 							message+='\n'
 						} else {
 							send($store,$data)
 						}
 						"></textarea>
-    					<button class="flex-shrink-0  w-20  h-10 md:h-16 ml-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg disabled:bg-gray-500" x-bind:disabled="disabled" @click="send($store,$data)">Send</button>
+    					<button class="flex-shrink-0  w-20  h-10 sm:h-16 ml-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg disabled:bg-gray-500" x-bind:disabled="disabled" @click="send($store,$data)">Send</button>
 					</div>
 					<!-- Scroll to top button -->
 					<button class="absolute bottom-20 -right-1  text-white font-bold py-2 px-4 rounded hidden"  x-ref="buttonTop" @click="$refs.scrollDiv.scrollTop=0">
