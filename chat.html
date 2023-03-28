@@ -71,7 +71,7 @@
 									<div class="flex w-full mt-2 space-x-3 ml-auto justify-end ">
 										<div>
 											<div class="p-3 rounded-l-lg rounded-br-lg bg-gray-100">
-												<div class="prose md:max-w-4xl " x-html="markedParse(msg.content)"></p>
+												<div class="whitespace-pre-line" x-text="msg.content" ></p>
 											</div>
 											<span class="text-xs text-gray-500 leading-none" x-text="msg.time_at"></span>
 										</div>
