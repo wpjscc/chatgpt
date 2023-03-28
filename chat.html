@@ -70,7 +70,7 @@
 								<template x-if="msg.is_self">
 									<div class="flex w-full mt-2 space-x-3 ml-auto justify-end ">
 										<div>
-											<div class="p-3 rounded-l-lg rounded-br-lg bg-gray-100">
+											<div class="p-3 rounded-l-lg rounded-br-lg bg-blue-200">
 												<div class="whitespace-pre-line" x-text="msg.content" ></p>
 											</div>
 											<span class="text-xs text-gray-500 leading-none" x-text="msg.time_at"></span>
@@ -124,7 +124,6 @@
 							send($store,$data)
 						}
 						"></textarea>
-    					<button class="flex-shrink-0  w-20  h-10 sm:h-16 ml-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg disabled:bg-gray-500" x-bind:disabled="disabled" @click="send($store,$data)">Send</button>
 					</div>
 					<!-- Scroll to top button -->
 					<button class="absolute bottom-20 -right-1  text-white font-bold py-2 px-4 rounded hidden"  x-ref="buttonTop" @click="$refs.scrollDiv.scrollTop=0">
