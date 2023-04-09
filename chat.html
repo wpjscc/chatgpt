@@ -229,7 +229,6 @@
 						Alpine.store('code').code = env.element.innerText
 						Alpine.store('code').toggle()
 					} else {
-						console.log(11111);
 						Alpine.store('edit_code').code = markedParse(env.element.innerText)
 						setTimeout(() => {
 							window.highlightElement('#preview-edit code')
