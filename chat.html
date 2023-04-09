@@ -288,11 +288,11 @@
 				},
 				edit(innerHtml) {
 					this.code = innerHtml
-					this.toggle()
 					setTimeout(() => {
 						window.highlightElement('#edit code')
 						window.highlightElement('#preview code')
-					}, 200);
+						this.toggle()
+					}, 0);
 				}
 			})
 			Alpine.store('edit_code', {
