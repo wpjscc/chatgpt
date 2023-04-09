@@ -114,7 +114,7 @@
 						@keydown.shift="shiftPressed = true"
 						@keyup.shift="shiftPressed = false" 
 						@keydown.ctrl="ctrlPressed = true"
-						@keydown.ctrl="ctrlPressed = false"
+						@keyup.ctrl="ctrlPressed = false"
 						x-model="message"
 						x-bind:disabled="disabled"
 						@keyup.enter.prevent="
