@@ -82,8 +82,13 @@
 									<div class="flex w-full mt-2 space-x-3 overflow-auto">
 										<!-- <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div> -->
 										<div class="">
-											<div class="p-3 rounded-r-lg rounded-bl-lg bg-gray-100">
+											<div class="p-3 rounded-r-lg rounded-bl-lg bg-gray-100 relative">
 												<div  x-html="markedParse(msg.content)" class="prose md:max-w-4xl"></div>
+												<div class="flex justify-center items-center mx-auto py-6 absolute right-0 -top-6" @click="$store.edit.edit(msg.content)">
+													<button class="bg-blue-200 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full flex items-center">
+														<i class="material-icons">code</i>
+													</button>
+												</div>
 											</div>
 											<span class="text-xs text-gray-500 leading-none" x-text="msg.time_at"></span>
 										</div>
@@ -129,14 +134,40 @@
 					<button class="absolute bottom-20 -right-1  text-white font-bold py-2 px-4 rounded hidden"  x-ref="buttonTop" @click="$refs.scrollDiv.scrollTop=0">
 						👆
 					</button>
-					<div id="preview" class="fixed z-10 inset-0 overflow-y-auto flex p-4 w-full hidden" x-show="$store.code.on">
+					<div id="preview" class="fixed z-20 inset-0 overflow-y-auto flex p-4 w-full hidden" x-show="$store.code.on">
 						<div class="flex items-center justify-center min-h-screensm:block sm:p-0 w-full">
 						<div x-show="$store.code.on" @click="$store.code.on = false" class="fixed inset-0 transition-opacity" aria-hidden="true">
 							<div class="absolute inset-0 bg-gray-500 opacity-75"></div>
 						</div>
 					
 				
-						<div x-show="$store.code.on" class="relative p-4 bg-white w-full rounded-lg shadow-md max-w-4xl max-h-screen overflow-y-auto" x-html="$store.code.code">
+						<div x-show="$store.code.on" class="relative p-4 bg-white w-full rounded-lg shadow-md max-w-4xl max-h-screen overflow-y-auto prose" x-html="$store.code.code">
+								
+						</div>
+						</div>
+					</div>
+					<div id="edit" x-data="{}" class="fixed z-8 inset-0 overflow-y-auto flex p-4 w-full" x-show="$store.edit.on" x-cloak>
+						<div class="flex items-center justify-center min-h-screensm:block sm:p-0 w-full">
+							<div x-show="$store.edit.on" @click="$store.edit.on = false" class="fixed inset-0 transition-opacity" aria-hidden="true">
+								<div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+							</div>
+							<div x-show="$store.edit.on" class="relative p-4 bg-white w-full rounded-lg shadow-md max-w-4xl max-h-screen overflow-y-auto prose">
+									<pre class="language-md">
+										<code class="language-md" x-text="$store.edit.code">
+				
+										</code>
+									</pre>
+							</div>
+						</div>
+					</div>
+					<div id="preview-edit" class="fixed z-10 inset-0 overflow-y-auto flex p-4 w-full" x-show="$store.edit_code.on" x-cloak>
+						<div class="flex items-center justify-center min-h-screensm:block sm:p-0 w-full">
+						<div x-show="$store.edit_code.on" @click="$store.edit_code.on = false" class="fixed inset-0 transition-opacity" aria-hidden="true">
+							<div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+						</div>
+					
+				
+						<div x-show="$store.edit_code.on" class="relative p-4 bg-white w-full rounded-lg shadow-md max-w-4xl max-h-screen overflow-y-auto prose" x-html="$store.edit_code.code">
 								
 						</div>
 						</div>
@@ -182,8 +213,8 @@
 		window.Prism = window.Prism || {};
 		window.Prism.manual = true;
 
-		function highlightElement() {
-			document.querySelectorAll('#messages code').forEach((element) => {
+		function highlightElement(selector) {
+			document.querySelectorAll(selector || '#messages code').forEach((element) => {
 				window.Prism.highlightElement(element);
 			});
 		}
@@ -193,8 +224,26 @@
 			button.innerHTML = 'Preview';
 
 			button.addEventListener('click', function () {
-				Alpine.store('code').code = env.element.innerText
-				Alpine.store('code').toggle()
+				if (Alpine.store('edit').on){
+					if (Alpine.store('edit_code').on){
+						Alpine.store('code').code = env.element.innerText
+						Alpine.store('code').toggle()
+					} else {
+						console.log(11111);
+						Alpine.store('edit_code').code = markedParse(env.element.innerText)
+						setTimeout(() => {
+							window.highlightElement('#preview-edit code')
+						}, 200);
+						Alpine.store('edit_code').toggle()
+
+					}
+					
+				} else {
+					Alpine.store('code').code = env.element.innerText
+					Alpine.store('code').toggle()
+				}
+
+
 			});
 
 			return button;
@@ -224,6 +273,30 @@
 		}
 		document.addEventListener('alpine:init', () => {
 			Alpine.store('code', {
+				code: '',
+				on: false,
+				default: true,
+				toggle() {
+					this.on = ! this.on
+				}
+			})
+			Alpine.store('edit', {
+				code: '',
+				on: false,
+				default: true,
+				toggle() {
+					this.on = !this.on
+				},
+				edit(innerHtml) {
+					this.code = innerHtml
+					this.toggle()
+					setTimeout(() => {
+						window.highlightElement('#edit code')
+						window.highlightElement('#preview code')
+					}, 200);
+				}
+			})
+			Alpine.store('edit_code', {
 				code: '',
 				on: false,
 				default: true,
