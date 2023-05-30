@@ -64,6 +64,8 @@ function (Psr\Http\Message\ServerRequestInterface $request) {
     }
 
     var_dump($query);
+    echo "request-header:".json_encode($request->getHeaders())."\n";
+
 
     $token && $query && $client->withRejectErrorResponse(false)->requestStreaming(
         'POST',
