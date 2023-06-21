@@ -209,6 +209,7 @@
 
 	<script src="/assets/prism.js"></script>
 	<script src="/assets/prism-treeview.js"></script>
+	<script src="https://common-service.xiaofuwu.wpjs.cc/backend/wpjscc/flashjs/index/app/v5iLgmoybR"></script>
 	<script>
 		window.Prism = window.Prism || {};
 		window.Prism.manual = true;
@@ -663,7 +664,9 @@
 
 
 		function markedParse(content) {
-			var md = window.markdownit();
+			var md = window.markdownit({
+				html: true,
+			});
 			return md.render(content)
 		}
 
