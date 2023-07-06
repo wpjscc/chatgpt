@@ -116,7 +116,7 @@ $http = new React\Http\HttpServer(
            
         }
 
-        if ($havBucket) {
+        if ($query && $token && $havBucket) {
             
             // 非自定义token 才限制，要不要token用完了～
 
@@ -130,6 +130,7 @@ $http = new React\Http\HttpServer(
                 ),
                 json_encode([
                     'model' => 'gpt-3.5-turbo-0301',
+                    'max_tokens' => getParam('max-token', 256),
                     'messages' => [
                         [
                             'role' => 'user',
