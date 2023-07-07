@@ -118,7 +118,22 @@ $http = new React\Http\HttpServer(
 
         if ($query && $token && $havBucket) {
             
-            // 非自定义token 才限制，要不要token用完了～
+
+            $data = [
+                'model' => 'gpt-3.5-turbo-0301',
+                'messages' => [
+                    [
+                        'role' => 'user',
+                        'content' => $query
+                    ]
+                ],
+                'stream' => true
+            ];
+
+            // 非自定义token 才限制，要不token用完了～
+            if (!$isCustomeToken) {
+                $data['max_tokens'] = getParam('max-tokens', 512);
+            }
 
             $client->withRejectErrorResponse(false)->requestStreaming(
                 'POST',
@@ -128,17 +143,7 @@ $http = new React\Http\HttpServer(
                     'Content-Type' => 'application/json',
                     'Cache-Control' => 'no-cache'
                 ),
-                json_encode([
-                    'model' => 'gpt-3.5-turbo-0301',
-                    'max_tokens' => getParam('max-token', 256),
-                    'messages' => [
-                        [
-                            'role' => 'user',
-                            'content' => $query
-                        ]
-                    ],
-                    'stream' => true
-                ])
+                json_encode($data)
             )->then(function (Psr\Http\Message\ResponseInterface $response) use ($stream) {
                 echo "response";
                 echo json_encode($response->getHeaders()) . "\n";
