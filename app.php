@@ -159,10 +159,12 @@ $http = new React\Http\HttpServer(
         }
 
         if ($messages && $token && $havBucket) {
-
+            // https://platform.openai.com/docs/models/gpt-3-5
+            // https://platform.openai.com/account/rate-limits
+            // https://openai.com/pricing#language-models
             $data = [
-                // 'model' => 'gpt-3.5-turbo-0301',
-                'model' => 'gpt-3.5-turbo-0613',// 可以函数调用
+                'model' => 'gpt-3.5-turbo',
+                // 'model' => 'gpt-3.5-turbo-0613',// 可以函数调用--发布新的不会维护了
                 'messages' => $messages,
                 'stream' => true
             ];
