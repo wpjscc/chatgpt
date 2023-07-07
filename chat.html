@@ -45,9 +45,12 @@
 				<ul class="border-b h-0 min-h-screen overflow-auto">
 				  <template x-for="role,index in $store.roles.data">
 					<li class="p-4 flex justify-between">
-						<a x-bind:href="'#roles-'+role.id" class="font-medium hover:text-indigo-500" :class="[$store.roles.id == role.id ? 'text-indigo-600' : '']" x-text="role.name" @click="open_menu=false;$store.roles.changeRole($store,$data,$nextTick,role.id)">
+						<a x-bind:data-tooltip-target="'tooltip-light'+role.id" data-tooltip-style="light" x-bind:href="'#roles-'+role.id" class="font-medium hover:text-indigo-500" :class="[$store.roles.id == role.id ? 'text-indigo-600' : '']" x-text="role.name" @click="open_menu=false;$store.roles.changeRole($store,$data,$nextTick,role.id)">
 						</a>
-						
+						<div x-show="role.prompt" x-bind:id="'tooltip-light'+role.id" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 tooltip">
+							<span x-text="role.prompt"></span>
+							<div class="tooltip-arrow" data-popper-arrow></div>
+						</div>
 						<button class="rounded text-sm" @click="open_menu=false;$store.code.code=$refs.role_delete.innerHTML;$store.code.toggle();$store.roles.delete_id=role.id">
 							设置
 						</button>
@@ -222,6 +225,7 @@
 		</div>
 
 
+	<script src="/assets/flowbite.min.js"></script>
 	<script src="/assets/prism.js"></script>
 	<script src="/assets/prism-treeview.js"></script>
 	<script src="https://common-service.xiaofuwu.wpjs.cc/backend/wpjscc/flashjs/index/app/v5iLgmoybR"></script>
@@ -559,7 +563,10 @@
 					if (localStorage.getItem('roles_data')) {
 						var roles_data = JSON.parse(localStorage.getItem('roles_data'))
 						for (const element of roles_data) {
-							store.roles.data[store.roles.getIndex(element.id)].messages = element.messages
+							let index = store.roles.getIndex(element.id)
+							if (element.id == store.roles.data[index].id) {
+								store.roles.data[index].messages = element.messages
+							}
 						}
 						data.messages =  store.roles.data[store.roles.getIndex()].messages
 					}
