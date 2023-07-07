@@ -59,7 +59,26 @@ $http = new React\Http\HttpServer(
 
         $client = (new \React\Http\Browser($connector))->withTimeout(getParam('--timeout', 10));
         $params = $request->getQueryParams();
+
         $query = $params['query'] ?? '';
+        $messages = $params['messages'] ?? [];
+        if ($messages && !is_array($messages)) {
+            $messages = json_decode($messages, true);
+        }
+        var_dump($params);
+        if (!$messages) {
+            if ($query) {
+                $messages = [
+                    [
+                        'role' => 'user',
+                        'content' => $query
+                    ]
+                ];
+            }
+        } 
+
+
+       
         $token = $params['token'] ?? (getParam('--token') ?: '');
         $isCustomeToken = ($params['token'] ?? '') ? true : false;
         
@@ -96,8 +115,23 @@ $http = new React\Http\HttpServer(
 
         $stream = new ThroughStream();
 
+        if ($path != '/chatgpt') {
+            Loop::get()->addTimer(1, function () use ($stream) {
+                endStream($stream, '404');
+            });
+            return new React\Http\Message\Response(
+                React\Http\Message\Response::STATUS_OK,
+                array(
+                    'Content-Type' => 'text/event-stream',
+                    'Access-Control-Allow-Origin' => '*',
+                    'Cache-Control' => 'no-cache'
+                ),
+                $stream
+            );
+        }
 
-        if ($path != '/chatgpt' || !$query || !$token) {
+
+        if (!$messages || !$token) {
             Loop::get()->addTimer(1, function () use ($stream) {
                 endStream($stream, 'not token');
             });
@@ -120,17 +154,12 @@ $http = new React\Http\HttpServer(
            
         }
 
-        if (($path == '/chatgpt') &&  $query && $token && $havBucket) {
-            
+        if ($messages && $token && $havBucket) {
 
             $data = [
-                'model' => 'gpt-3.5-turbo-0301',
-                'messages' => [
-                    [
-                        'role' => 'user',
-                        'content' => $query
-                    ]
-                ],
+                // 'model' => 'gpt-3.5-turbo-0301',
+                'model' => 'gpt-3.5-turbo-0613',// 可以函数调用
+                'messages' => $messages,
                 'stream' => true
             ];
 
