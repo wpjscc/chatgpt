@@ -41,17 +41,16 @@
 					</svg>
 				</button>
 			</div>
-			<div class="bg-white w-64" :class="{ 'hidden md:block': !open_menu, 'absolute z-20': open_menu }" x-cloak id="left-menu">
+			<div class="bg-white w-96" :class="{ 'hidden md:block': !open_menu, 'absolute z-20': open_menu }" x-cloak id="left-menu">
 				<ul class="border-b h-0 min-h-screen overflow-auto">
 				  <template x-for="role,index in $store.roles.data">
 					<li class="p-4">
 						<a x-bind:href="'#roles-'+role.id" class="font-medium hover:text-indigo-500" :class="[$store.roles.id == role.id ? 'text-indigo-600' : '']" x-text="role.name" @click="open_menu=false;$store.roles.changeRole($store,$data,$nextTick,role.id)">
 						</a>
-						<template x-if="role.is_can_delete || role.messages.length>0">
-							<button class="w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-md text-sm" @click="open_menu=false;$store.code.code=$refs.role_delete.innerHTML;$store.code.toggle();$store.roles.delete_id=role.id">
-								-
-							</button>
-						</template>
+						
+						<button class="bg-blue-100 rounded text-sm" @click="open_menu=false;$store.code.code=$refs.role_delete.innerHTML;$store.code.toggle();$store.roles.delete_id=role.id">
+							设置
+						</button>
 					  </li>
 				  </template>
 				  <li class="p-4 flex justify-center items-center">						
@@ -196,7 +195,7 @@
 									prompt</span>
 								</label>
 								<textarea class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" x-model="$store.roles.role.prompt"  rows="5" :placeholder="
-								$store.roles.role.type==1 ? '你是个乐于助人的助手.': '(例子：【I want you to act as a linux terminal. I will type commands and you will reply with what the terminal should show. I want you to only reply with the terminal output inside one unique code block, and nothing else. do not write explanations. do not type commands unless I instruct you to do so. When I need to tell you something in English, I will do so by putting text inside curly brackets {like this}. My first command is {prompt}】'
+								$store.roles.role.type==1 ? '你是个乐于助人的助手.': '例子：【I want you to act as a linux terminal. I will type commands and you will reply with what the terminal should show. I want you to only reply with the terminal output inside one unique code block, and nothing else. do not write explanations. do not type commands unless I instruct you to do so. When I need to tell you something in English, I will do so by putting text inside curly brackets {like this}. My first command is {prompt}】'
 								"></textarea>
 							</div>
 
@@ -333,22 +332,22 @@
 				data: [
 					{
 						id: 1,
-						type: 0,
+						type: 1,
 						is_can_delete: false,
 						name: 'Chat',
 						messages: [],
 						prompt: '',
 						default: ''
 					},
-					{
-						id: 2,
-						type: 1,
-						is_can_delete: false,
-						name: 'Chat With Context',
-						messages: [],
-						prompt: '',
-						default: ''
-					},
+					// {
+					// 	id: 2,
+					// 	type: 1,
+					// 	is_can_delete: false,
+					// 	name: 'Chat With Context',
+					// 	messages: [],
+					// 	prompt: '',
+					// 	default: ''
+					// },
 					{
 						id: 50,
 						type: 1,
@@ -358,22 +357,22 @@
 						prompt: '假设你是一个始终用苏格拉底风格回答问题的导师。你不会直接给我答案，而是会引导我去思考，可以吗？',
 						default: ''
 					},
-					{
-						id: 1000,
-						type: 2,
-						is_can_delete: false,
-						name: '是什么，哪里来，哪里去',
-						messages: [],
-						prompt: `当我提出一个知识点时，你应该提出三个问题，并且尝试回答这三个问题：
-这三个问题应该按下面的思路去提问:
+// 					{
+// 						id: 1000,
+// 						type: 2,
+// 						is_can_delete: false,
+// 						name: '我是谁，从哪里来，到哪里去',
+// 						messages: [],
+// 						prompt: `当我提出一个知识点时，你应该提出三个问题，并且尝试回答这三个问题：
+// 这三个问题应该按下面的思路去提问:
 
-1.从哪里来？这个知识点是如何产生的，它是基于什么背景和前提条件，有哪些人或组织参与了这个知识点的研究和发展，其他相关的研究或理论是否对产生这个知识点起到了影响或启发？
+// 1.从哪里来？这个知识点是如何产生的，它是基于什么背景和前提条件，有哪些人或组织参与了这个知识点的研究和发展，其他相关的研究或理论是否对产生这个知识点起到了影响或启发？
 
-2.是什么？这个知识点的具体定义是什么，它包含哪些关键要素或概念，它解决了什么问题或提供了什么方案，有没有实际应用或示例可以说明它的作用，这个知识点是否与其他相关的知识点有联系或相互依赖？
+// 2.是什么？这个知识点的具体定义是什么，它包含哪些关键要素或概念，它解决了什么问题或提供了什么方案，有没有实际应用或示例可以说明它的作用，这个知识点是否与其他相关的知识点有联系或相互依赖？
 
-3.到哪里去？这个知识点是否存在一些缺陷或局限性，有哪些因素可能限制它的应用或发展，有没有已有的研究或实践表明这个知识点还有哪些潜在的改进或发展方向，在未来，这个知识点是否有可能被进一步扩展或应用到其他领域？它的发展前景如何？`,
-						default: ''
-					},
+// 3.到哪里去？这个知识点是否存在一些缺陷或局限性，有哪些因素可能限制它的应用或发展，有没有已有的研究或实践表明这个知识点还有哪些潜在的改进或发展方向，在未来，这个知识点是否有可能被进一步扩展或应用到其他领域？它的发展前景如何？`,
+// 						default: ''
+// 					},
 					{
 						id: 2000,
 						type: 2,
@@ -390,32 +389,6 @@
 						name: '作为中文翻译和改进者',
 						messages: [],
 						prompt: 'I want you to act as an Chinese translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in Chinese. I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, upper level Chinese words and sentences. Keep the meaning same, but make them more literary. I want you to only reply the correction, the improvements and nothing else, do not write explanations. My first sentence is "{prompt}"',
-						default: ''
-					},
-					{
-						id: 4000,
-						type: 2,
-						is_can_delete: false,
-						name: '作为 Linux 终端',
-						messages: [],
-						prompt: 'I want you to act as a linux terminal. I will type commands and you will reply with what the terminal should show. I want you to only reply with the terminal output inside one unique code block, and nothing else. do not write explanations. do not type commands unless I instruct you to do so. When I need to tell you something in English, I will do so by putting text inside curly brackets {like this}. My first command is {prompt}',
-						default: ''
-					},
-					{
-						id: 5000,
-						type: 2,
-						is_can_delete: false,
-						name: '作为 JavaScript 控制台',
-						messages: [],
-						prompt: 'I want you to act as a javascript console. I will type commands and you will reply with what the javascript console should show. I want you to only reply with the terminal output inside one unique code block, and nothing else. do not write explanations. do not type commands unless I instruct you to do so. when I need to tell you something in english, I will do so by putting text inside curly brackets {like this}. My first command is {prompt};',
-						default: ''
-					},
-					{
-						id: 6000,
-						is_can_delete: false,
-						name: '作为 PHP 解释器',
-						messages: [],
-						prompt: 'I want you to act like a php interpreter. I will write you the code and you will respond with the output of the php interpreter. I want you to only reply with the terminal output inside one unique code block, and nothing else. do not write explanations. Do not type commands unless I instruct you to do so. When i need to tell you something in english, i will do so by putting text inside curly brackets {like this}. My first command is <?php {prompt}',
 						default: ''
 					},
 					{
@@ -436,15 +409,15 @@
 						prompt: '用 Tailwindcss & Alpine js, 设计一个{prompt}.请给一些示例',
 						default: ''
 					},
-					{
-						id: 1100,
-						type: 2,
-						is_can_delete: false,
-						name: '反方辩友',
-						messages: [],
-						prompt: `请针对下面的观点，提出3个反驳论点，对每个论点，提供佐证或者依据`,
-						default: ''
-					},
+					// {
+					// 	id: 1100,
+					// 	type: 2,
+					// 	is_can_delete: false,
+					// 	name: '反方辩友',
+					// 	messages: [],
+					// 	prompt: `请针对下面的观点，提出3个反驳论点，对每个论点，提供佐证或者依据`,
+					// 	default: ''
+					// },
 				],
 				id: 1,
 				delete_id: 0,
@@ -475,7 +448,7 @@
 					store.code.toggle()
 				},
 				clearRole(store, data, $nextTick ,id){
-					var current_role = this.getCurrentRole()
+					var current_role = this.getCurrentRole
 					if (current_role.id == id) {
 						data.messages = []
 					}
@@ -514,8 +487,8 @@
 					}
 				},
 				transformMessage(message){
-					if (this.getCurrentRole().prompt) {
-						return this.getCurrentRole().prompt.replace('{prompt}', message)
+					if (this.getCurrentRole.prompt) {
+						return this.getCurrentRole.prompt.replace('{prompt}', message)
 					}
 					return message
 				},
@@ -527,11 +500,13 @@
 					})
 
 					// 不包含说明分开的
-					if (!this.getCurrentRole().prompt.includes('{prompt}')) {
-						messages.push({
-							role:'user',
-							content: message
-						})
+					if (!this.getCurrentRole.prompt.includes('{prompt}')) {
+						if (message.trim()){
+							messages.push({
+								role:'user',
+								content: message.trim()
+							})
+						}
 					}
 					
 					return messages
@@ -539,7 +514,7 @@
 				transformContextMessages(current_messages){
 
 					var messages = JSON.parse(JSON.stringify(current_messages)).filter(function(message){
-						return !message.is_error
+						return !message.is_error && message.content.trim()
 					}).map(function(message) {
 							if (message.is_self) {
 								return {
@@ -556,7 +531,7 @@
 
 					messages.unshift({
 						role: 'system',
-						content: this.getCurrentRole().prompt || '你是个乐于助人的助手.',
+						content: this.getCurrentRole.prompt || '你是个乐于助人的助手.',
 					})
 					return messages
 				},
@@ -665,7 +640,7 @@
 					})
 					this.setRolesData(roles_data)
 				},
-				getCurrentRole(){
+				get getCurrentRole(){
 					return this.data[this.getIndex()]
 				},
 				getRolesData(){
@@ -727,7 +702,7 @@
 				data.disabled = false
 				return ;
 			}
-			var current_role = store.roles.getCurrentRole()
+			var current_role = store.roles.getCurrentRole
 			data.messages = current_role.messages
 			data.messages.push({
 				is_self: true,
