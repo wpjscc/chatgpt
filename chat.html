@@ -44,17 +44,17 @@
 			<div class="bg-white w-96" :class="{ 'hidden md:block': !open_menu, 'absolute z-20': open_menu }" x-cloak id="left-menu">
 				<ul class="border-b h-0 min-h-screen overflow-auto">
 				  <template x-for="role,index in $store.roles.data">
-					<li class="p-4">
+					<li class="p-4 flex justify-between">
 						<a x-bind:href="'#roles-'+role.id" class="font-medium hover:text-indigo-500" :class="[$store.roles.id == role.id ? 'text-indigo-600' : '']" x-text="role.name" @click="open_menu=false;$store.roles.changeRole($store,$data,$nextTick,role.id)">
 						</a>
 						
-						<button class="bg-blue-100 rounded text-sm" @click="open_menu=false;$store.code.code=$refs.role_delete.innerHTML;$store.code.toggle();$store.roles.delete_id=role.id">
+						<button class="rounded text-sm" @click="open_menu=false;$store.code.code=$refs.role_delete.innerHTML;$store.code.toggle();$store.roles.delete_id=role.id">
 							设置
 						</button>
 					  </li>
 				  </template>
 				  <li class="p-4 flex justify-center items-center">						
-					<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold w-6 h-6 rounded text-xs" @click="open_menu=false;$store.code.code=$refs.form.innerHTML;$store.code.toggle()">
+					<button class="text-blue-500 font-bold w-6 h-6 rounded text-xs" @click="open_menu=false;$store.code.code=$refs.form.innerHTML;$store.code.toggle()">
 					+
 					</button>
 				</li>
