@@ -18,10 +18,7 @@ class BucketManager
             return;
         }
 
-        $currentLength = count(self::$buckets);
-        for ($i = 0; $i < self::$number - $currentLength; $i++) {
-            array_push(self::$buckets, 1);
-        }
+        array_push(self::$buckets, 1);
 
     }
 
@@ -30,6 +27,11 @@ class BucketManager
         if (count(self::$buckets) == 0) {
             return false;
         }
+
+        Loop::get()->addTimer(1 * 60, function () {
+            BucketManager::addBucket();
+        });
+
         return array_pop(self::$buckets);
     }
 
@@ -284,7 +286,3 @@ function getFileType($filename)
 $socket = new React\Socket\SocketServer('0.0.0.0:' . (getParam('--port') ?: '8000'));
 $http->listen($socket);
 
-
-Loop::get()->addPeriodicTimer(1 * 60, function () {
-    BucketManager::addBucket();
-});
