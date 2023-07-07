@@ -35,6 +35,10 @@ class BucketManager
 
 }
 
+if (getParam('--every-minute-times')) {
+    BucketManager::$number = (int) getParam('--every-minute-times');
+}
+
 BucketManager::addBucket();
 
 var_dump(BucketManager::$buckets);
@@ -110,7 +114,7 @@ $http = new React\Http\HttpServer(
             // 用完了
             if ($havBucket === false) {
                 Loop::get()->addTimer(1, function () use ($stream) {
-                    endStream($stream, 'over '.BucketManager::$number .' times in one minute');
+                    endStream($stream, 'over '.BucketManager::$number .' times in one minute please wait one minute');
                 });
             }
            
@@ -132,7 +136,9 @@ $http = new React\Http\HttpServer(
 
             // 非自定义token 才限制，要不token用完了～
             if (!$isCustomeToken) {
-                $data['max_tokens'] = getParam('max-tokens', 512);
+                if (getParam('max-tokens')) {
+                    $data['max_tokens'] = (int) getParam('max-tokens');
+                }
             }
 
             $client->withRejectErrorResponse(false)->requestStreaming(
