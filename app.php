@@ -12,19 +12,21 @@ class BucketManager
 
     static $number = 3;
 
-    public static function addBucket()
+    public static function addBucket($default = 1)
     {
-        if (count(self::$buckets) >= self::$number) {
+        if (count(static::$buckets) >= self::$number) {
             return;
         }
 
-        array_push(self::$buckets, 1);
+        for ($i=0; $i < $default; $i++) { 
+            array_push(static::$buckets, 1);
+        }
 
     }
 
     public static function getBucket()
     {
-        if (count(self::$buckets) == 0) {
+        if (count(static::$buckets) == 0) {
             return false;
         }
 
@@ -32,7 +34,7 @@ class BucketManager
             BucketManager::addBucket();
         });
 
-        return array_pop(self::$buckets);
+        return array_pop(static::$buckets);
     }
 
 }
@@ -41,7 +43,7 @@ if (getParam('--every-minute-times')) {
     BucketManager::$number = (int) getParam('--every-minute-times');
 }
 
-BucketManager::addBucket();
+BucketManager::addBucket(BucketManager::$number);
 
 var_dump(BucketManager::$buckets);
 
