@@ -116,7 +116,7 @@ $http = new React\Http\HttpServer(
            
         }
 
-        if ($query && $token && $havBucket) {
+        if (($path == '/chatgpt') &&  $query && $token && $havBucket) {
             
 
             $data = [
