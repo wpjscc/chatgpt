@@ -538,7 +538,9 @@
 				},
 				transformContextMessages(current_messages){
 
-					var messages = JSON.parse(JSON.stringify(current_messages)).map(function(message) {
+					var messages = JSON.parse(JSON.stringify(current_messages)).filter(function(message){
+						return !message.is_error
+					}).map(function(message) {
 							if (message.is_self) {
 								return {
 									role: 'user',
@@ -763,11 +765,12 @@
 			var eventSource = new EventSource(url);
 
 			data.message = '';
-
+			var is_error = false
 			eventSource.onmessage = function (e) {
 				if(e.data == "[DONE]")
 				{	
 					store.roles.data[store.roles.getIndex()].messages.push({
+						is_error: is_error,
 						is_self: false,
 						content: data.content,
 						time_at: new Date().Format("yyyy-MM-dd hh:mm:ss")
@@ -788,8 +791,12 @@
 					if (res.choices && res.choices[0]) {
 						if(res.choices[0].delta.content) {
 							data.content += res.choices[0].delta.content
+							if (res.choices[0].delta.is_error) {
+								is_error = true
+							}
 						}
 					} else {
+						is_error = true
 						data.content += JSON.stringify(res)
 					}
 					// console.log('data:',data.content)
@@ -801,6 +808,7 @@
 				console.log(e)
 				if (data.content) {
 					store.roles.data[store.roles.getIndex()].messages.push({
+						is_error: is_error,
 						is_self: false,
 						content: data.content,
 						time_at: new Date().Format("yyyy-MM-dd hh:mm:ss")

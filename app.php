@@ -252,7 +252,8 @@ function getData($msg)
     return 'data: ' . json_encode(['choices' => [
         [
             'delta' => [
-                'content' => $msg
+                'content' => $msg,
+                'is_error' => true
             ]
         ]
     ]]) . "\n\n";
