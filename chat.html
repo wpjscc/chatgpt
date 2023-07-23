@@ -9,6 +9,7 @@
 	<link rel="stylesheet" href="/assets/prism-light.css" />
 	<script src="/assets/tailwindcss.js"></script>
 	<script src="/assets/markdown-it.min.js" defer></script>
+	<script src="/assets/alpinejs-persist.js"></script>
 	<script src="/assets/alpinejs.js" defer></script>
     <script>
         tailwind.config = {
@@ -51,8 +52,8 @@
 							<span x-text="role.prompt"></span>
 							<div class="tooltip-arrow" data-popper-arrow></div>
 						</div>
-						<button class="rounded text-sm" @click="open_menu=false;$store.code.code=$refs.role_delete.innerHTML;$store.code.toggle();$store.roles.delete_id=role.id">
-							设置
+						<button class="rounded text-sm" @click="open_menu=false;$store.code.code=$refs.edit_role.innerHTML;$store.code.toggle();$store.roles.edit_id=role.id">
+							编辑
 						</button>
 					  </li>
 				  </template>
@@ -136,6 +137,7 @@
 					<button class="absolute bottom-20 -right-1  text-white font-bold py-2 px-4 rounded hidden"  x-ref="buttonTop" @click="$refs.scrollDiv.scrollTop=0">
 						👆
 					</button>
+					<!-- 点击preview -->
 					<div id="preview" class="fixed z-20 inset-0 overflow-y-auto flex p-4 w-full hidden" x-show="$store.code.on">
 						<div class="flex items-center justify-center min-h-screensm:block sm:p-0 w-full">
 						<div x-show="$store.code.on" @click="$store.code.on = false" class="fixed inset-0 transition-opacity" aria-hidden="true">
@@ -148,6 +150,7 @@
 						</div>
 						</div>
 					</div>
+					<!-- 点击右上角的code -->
 					<div id="edit" x-data="{}" class="fixed z-8 inset-0 overflow-y-auto flex p-4 w-full" x-show="$store.edit.on" x-cloak>
 						<div class="flex items-center justify-center min-h-screensm:block sm:p-0 w-full">
 							<div x-show="$store.edit.on" @click="$store.edit.on = false" class="fixed inset-0 transition-opacity" aria-hidden="true">
@@ -162,6 +165,7 @@
 							</div>
 						</div>
 					</div>
+					<!-- 点击右上角code后，在点击预览 -->
 					<div id="preview-edit" class="fixed z-10 inset-0 overflow-y-auto flex p-4 w-full" x-show="$store.edit_code.on" x-cloak>
 						<div class="flex items-center justify-center min-h-screensm:block sm:p-0 w-full">
 						<div x-show="$store.edit_code.on" @click="$store.edit_code.on = false" class="fixed inset-0 transition-opacity" aria-hidden="true">
@@ -174,6 +178,7 @@
 						</div>
 						</div>
 					</div>
+					<!-- 添加角色 -->
 					<div class="hidden" x-ref="form">
 						<form class="bg-gray-100 p-6 rounded-lg">
 							<div class="mb-4">
@@ -210,13 +215,25 @@
 							</div>
 						  </form>
 					</div>
-					<div class="hidden" x-ref="role_delete">
+					<!-- 编辑角色 -->
+					<div class="hidden" x-ref="edit_role">
 						<div class="bg-white p-4 rounded shadow-lg">
 							<p class="mb-4">确认操作？</p>
+							<p class="mb-4">
+								<input class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" x-model="$store.roles.getEditRole.name" type="text" placeholder="请输入角色名称">
+							</p>
+							<select x-show="$store.roles.getEditRole.type>0" class="mb-4 block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-3 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline" x-model="$store.roles.getEditRole.type">
+								<option value="0">一般聊天</option>
+								<option value="1">聊天(有上下文)</option>
+								<option value="2">专有角色</option>
+							  </select>
+							<div class="mb-4" x-show="$store.roles.getEditRole.type>0">
+								<textarea class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" x-model="$store.roles.getEditRole.prompt"  rows="5"></textarea>
+							</div>
 							<div class="flex justify-end">
-								<button class="px-4 py-2 bg-gray-400 text-white rounded mr-2" @click="$store.code.toggle()">取消</button>
-								<button class="px-4 py-2 bg-red-500 text-white rounded mr-2" @click="$store.roles.clearRole($store, $data, $nextTick ,$store.roles.delete_id)">清空回答</button>
-								<button class="px-4 py-2 bg-red-500 text-white rounded" @click="$store.roles.deleteRole($store, $data, $nextTick ,$store.roles.delete_id)">删除</button>
+								<button class="px-4 py-2 bg-gray-400 text-white rounded mr-2" @click="$store.code.toggle()">关闭</button>
+								<button class="px-4 py-2 bg-red-500 text-white rounded mr-2" @click="$store.roles.clearRole($store, $data, $nextTick ,$store.roles.edit_id)">清空回答</button>
+								<button class="px-4 py-2 bg-red-500 text-white rounded" @click="$store.roles.deleteRole($store, $data, $nextTick ,$store.roles.edit_id)">删除</button>
 							</div>
 						</div>
 					</div>
@@ -228,7 +245,7 @@
 	<script src="/assets/flowbite.min.js"></script>
 	<script src="/assets/prism.js"></script>
 	<script src="/assets/prism-treeview.js"></script>
-	<script src="https://common-service.xiaofuwu.wpjs.cc/backend/wpjscc/flashjs/index/app/v5iLgmoybR"></script>
+	<!-- <script src="https://common-service.xiaofuwu.wpjs.cc/backend/wpjscc/flashjs/index/app/v5iLgmoybR"></script> -->
 	<script>
 		window.Prism = window.Prism || {};
 		window.Prism.manual = true;
@@ -333,7 +350,7 @@
 					prompt: '',
 					default: ''
 				},
-				data: [
+				data: Alpine.$persist([
 					{
 						id: 1,
 						type: 0,
@@ -422,9 +439,9 @@
 					// 	prompt: `请针对下面的观点，提出3个反驳论点，对每个论点，提供佐证或者依据`,
 					// 	default: ''
 					// },
-				],
+				]),
 				id: 1,
-				delete_id: 0,
+				edit_id: 0,
 				initListenHashChange(store, data, $nextTick){
 					window.addEventListener("hashchange", () => {
 						var hash = getLocationHash();
@@ -447,7 +464,6 @@
 				},
 				deleteRole(store, data, $nextTick ,id){
 					this.deleteDataById(id)
-					this.deleteLocalRoles(id)
 					window.location.hash = "#roles-1";
 					store.code.toggle()
 				},
@@ -457,8 +473,6 @@
 						data.messages = []
 					}
 					this.clearDataById(id)
-					this.clearLocalRoles(id)
-					this.clearRolesData(id)
 					store.code.toggle()
 				},
 				getIndex(id){
@@ -556,21 +570,8 @@
 				setRolesMessages(store, data) {
 					store.roles.data[store.roles.getIndex()].messages = JSON.parse(JSON.stringify(store.roles.data[store.roles.getIndex()].messages)).slice(-max_message)
 					data.messages = store.roles.data[store.roles.getIndex()].messages
-					localStorage.setItem('roles_data', JSON.stringify(store.roles.data))
 				},
-				initResumeRolesMessages(store, data) {
-					store.roles.setIdByHash(getLocationHash())
-					if (localStorage.getItem('roles_data')) {
-						var roles_data = JSON.parse(localStorage.getItem('roles_data'))
-						for (const element of roles_data) {
-							let index = store.roles.getIndex(element.id)
-							if (element.id == store.roles.data[index].id) {
-								store.roles.data[index].messages = element.messages
-							}
-						}
-						data.messages =  store.roles.data[store.roles.getIndex()].messages
-					}
-				},
+				
 				addRole(store, data, $nextTick) {
 					var name = this.role.name
 					var prompt = this.role.prompt
@@ -584,10 +585,6 @@
 							alert('专业角色prompt不能为空')
 							return 
 						}
-						// if (!prompt.includes('{prompt}')) {
-						// 	alert('必须包含占位符{prompt}')
-						// 	return 
-						// }
 					}
 					
 					this.role.id = this.maxId() + 100;
@@ -611,62 +608,20 @@
 
 					return maxId
 				},
-				// 本地添加的角色
-				initResumeLocalRoles(store, data) {
-					store.roles.setIdByHash(getLocationHash())
-					if (localStorage.getItem('local_roles')) {
-						var local_roles = JSON.parse(localStorage.getItem('local_roles'))
-						store.roles.data.push(...local_roles)
-					}
-					this.setTitle()
-				},
-				deleteLocalRoles(id){
-					var local_roles = this.getLocalRoles()
-					local_roles = local_roles.filter(item=>{
-						return item.id !=id
-					})
-					this.setLocalRoles(local_roles)
-				},
-				clearLocalRoles(id){
-					var local_roles = this.getLocalRoles()
-					local_roles = local_roles.map(item=>{
-						if (item.id == id){
-							item.messages = []
-						}
-						return item
-					})
-					this.setLocalRoles(local_roles)
-				},
-				clearRolesData(id){
-					var roles_data = this.getRolesData()
-					roles_data = roles_data.map(item=>{
-						if (item.id == id){
-							item.messages = []
-						}
-						return item
-					})
-					this.setRolesData(roles_data)
-				},
 				get getCurrentRole(){
 					return this.data[this.getIndex()]
 				},
-				getRolesData(){
-					return JSON.parse(localStorage.getItem('roles_data') || '[]')  
-				},
-				setRolesData(roles_data){
-					localStorage.setItem('roles_data', JSON.stringify(roles_data))  
-				},
-				getLocalRoles(){
-					return JSON.parse(localStorage.getItem('local_roles') || '[]')  
-				},
-				setLocalRoles(roles){
-					localStorage.setItem('local_roles', JSON.stringify(roles))  
+				get getEditRole(){
+					for (let index = 0; index < this.data.length; index++) {
+						const element = this.data[index];
+						if (element.id == this.edit_id) {
+							return element
+						}
+					}
+					return {}
 				},
 				addLocalRole(role){
-					var roles = this.getLocalRoles()
-					roles.push(role)
 					this.data.push(role)
-					this.setLocalRoles(roles)
 				}
 			})
 			Alpine.data('data', () => {
@@ -689,8 +644,7 @@
 		var max_message = 20
 		function init(store, data, $nextTick) {
 			store.roles.initListenHashChange(store, data, $nextTick)
-			store.roles.initResumeLocalRoles(store, data)
-			store.roles.initResumeRolesMessages(store, data)
+			store.roles.setIdByHash(getLocationHash())
 			send(store, data, $nextTick)
 		}
 
