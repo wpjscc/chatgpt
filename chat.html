@@ -82,12 +82,12 @@
 									</div>
 								</template>
 								<template x-if="!msg.is_self">
-									<div class="flex w-full mt-2 space-x-3 overflow-auto">
+									<div class="flex w-full mt-2 space-x-3">
 										<!-- <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div> -->
 										<div class="">
 											<div class="p-3 rounded-r-lg rounded-bl-lg bg-gray-100 relative">
 												<div  x-html="markedParse(msg.content)" class="prose md:max-w-4xl"></div>
-												<div class="flex justify-center items-center mx-auto py-6 absolute -right-10 -top-10 z-auto" @click="$store.edit.edit(msg.content)">
+												<div class="absolute -right-5 -top-5 z-auto" @click="$store.edit.edit(msg.content)">
 													<button class="bg-blue-200 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full flex items-center">
 														<i class="material-icons">code</i>
 													</button>
@@ -443,6 +443,7 @@
 				id: 1,
 				edit_id: 0,
 				initListenHashChange(store, data, $nextTick){
+					data.messages = this.data[this.getIndex()].messages
 					window.addEventListener("hashchange", () => {
 						var hash = getLocationHash();
 						this.setIdByHash(hash)
@@ -644,7 +645,6 @@
 		var max_message = 20
 		function init(store, data, $nextTick) {
 			store.roles.initListenHashChange(store, data, $nextTick)
-			store.roles.setIdByHash(getLocationHash())
 			send(store, data, $nextTick)
 		}
 
