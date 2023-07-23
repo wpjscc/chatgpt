@@ -86,7 +86,7 @@
 					<div class="flex flex-col flex-grow h-0 p-4 overflow-auto" id="messages" x-ref="scrollDiv" @scroll="$refs.scrollDiv.scrollTop < 200 ? $refs.buttonTop.classList.add('hidden') :  $refs.buttonTop.classList.remove('hidden')">
 						<template x-for="msg in messages">
 							<div class="w-full">
-								<template x-if="msg.is_self">
+								<template x-if="msg.is_self==1">
 									<div class="flex w-full mt-2 space-x-3 ml-auto justify-end ">
 										<div>
 											<div class="p-3 rounded-l-lg rounded-br-lg bg-blue-200">
@@ -97,7 +97,7 @@
 										<!-- <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div> -->
 									</div>
 								</template>
-								<template x-if="!msg.is_self">
+								<template x-if="msg.is_self==0">
 									<div class="flex w-full mt-2 space-x-3">
 										<!-- <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div> -->
 										<div class="">
@@ -249,7 +249,7 @@
 							<div class="flex justify-end">
 								<button class="px-4 py-2 bg-gray-400 text-white rounded mr-2" @click="$store.code.toggle()">关闭</button>
 								<button class="px-4 py-2 bg-red-500 text-white rounded mr-2" @click="$store.roles.clearRole($store, $data, $nextTick ,$store.roles.edit_id)">清空回答</button>
-								<button class="px-4 py-2 bg-red-500 text-white rounded" @click="$store.roles.deleteRole($store, $data, $nextTick ,$store.roles.edit_id)">删除</button>
+								<button x-show="$store.roles.getEditRole.is_can_delete" class="px-4 py-2 bg-red-500 text-white rounded" @click="$store.roles.deleteRole($store, $data, $nextTick ,$store.roles.edit_id)">删除</button>
 							</div>
 						</div>
 					</div>
@@ -376,90 +376,14 @@
 						prompt: '',
 						default: ''
 					},
-					// {
-					// 	id: 2,
-					// 	type: 1,
-					// 	is_can_delete: false,
-					// 	name: 'Chat With Context',
-					// 	messages: [],
-					// 	prompt: '',
-					// 	default: ''
-					// },
-					{
-						id: 50,
-						type: 1,
-						is_can_delete: false,
-						name: '苏格拉底',
-						messages: [],
-						prompt: '假设你是一个始终用苏格拉底风格回答问题的导师。你不会直接给我答案，而是会引导我去思考，可以吗？',
-						default: ''
-					},
-// 					{
-// 						id: 1000,
-// 						type: 2,
-// 						is_can_delete: false,
-// 						name: '我是谁，从哪里来，到哪里去',
-// 						messages: [],
-// 						prompt: `当我提出一个知识点时，你应该提出三个问题，并且尝试回答这三个问题：
-// 这三个问题应该按下面的思路去提问:
 
-// 1.从哪里来？这个知识点是如何产生的，它是基于什么背景和前提条件，有哪些人或组织参与了这个知识点的研究和发展，其他相关的研究或理论是否对产生这个知识点起到了影响或启发？
-
-// 2.是什么？这个知识点的具体定义是什么，它包含哪些关键要素或概念，它解决了什么问题或提供了什么方案，有没有实际应用或示例可以说明它的作用，这个知识点是否与其他相关的知识点有联系或相互依赖？
-
-// 3.到哪里去？这个知识点是否存在一些缺陷或局限性，有哪些因素可能限制它的应用或发展，有没有已有的研究或实践表明这个知识点还有哪些潜在的改进或发展方向，在未来，这个知识点是否有可能被进一步扩展或应用到其他领域？它的发展前景如何？`,
-// 						default: ''
-// 					},
-					{
-						id: 2000,
-						type: 2,
-						is_can_delete: false,
-						name: '作为英语翻译和改进者',
-						messages: [],
-						prompt: 'I want you to act as an English translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in English. I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, upper level English words and sentences. Keep the meaning same, but make them more literary. I want you to only reply the correction, the improvements and nothing else, do not write explanations. My first sentence is "{prompt}"',
-						default: ''
-					},
-					{
-						id: 3000,
-						type: 2,
-						is_can_delete: false,
-						name: '作为中文翻译和改进者',
-						messages: [],
-						prompt: 'I want you to act as an Chinese translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in Chinese. I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, upper level Chinese words and sentences. Keep the meaning same, but make them more literary. I want you to only reply the correction, the improvements and nothing else, do not write explanations. My first sentence is "{prompt}"',
-						default: ''
-					},
-					{
-						id: 7000,
-						type: 2,
-						is_can_delete: false,
-						name: 'Tailwindcss',
-						messages: [],
-						prompt: '用 Tailwindcss, 设计一个{prompt}.请给一些示例',
-						default: ''
-					},
-					{
-						id: 8000,
-						type: 2,
-						is_can_delete: false,
-						name: 'Tailwindcss & Alpine js',
-						messages: [],
-						prompt: '用 Tailwindcss & Alpine js, 设计一个{prompt}.请给一些示例',
-						default: ''
-					},
-					// {
-					// 	id: 1100,
-					// 	type: 2,
-					// 	is_can_delete: false,
-					// 	name: '反方辩友',
-					// 	messages: [],
-					// 	prompt: `请针对下面的观点，提出3个反驳论点，对每个论点，提供佐证或者依据`,
-					// 	default: ''
-					// },
 				]),
 				id: 1,
 				edit_id: 0,
 				initListenHashChange(store, data, $nextTick){
-					data.messages = this.data[this.getIndex()].messages
+					this.setIdByHash(getLocationHash())
+					this.syncCurrentMessages(data)
+					this.syncRemoteMessages(data, $nextTick)
 					window.addEventListener("hashchange", () => {
 						var hash = getLocationHash();
 						this.setIdByHash(hash)
@@ -470,6 +394,29 @@
 							highlightElement()
 						})
 					})
+				},
+				syncRemoteMessages(data, $nextTick){
+					fetch('https://blog.wpjs.cc/backend/wpjscc/prompt/prompts/prompts')
+					.then(response => response.json())
+					.then(jsonData => {
+						console.log(jsonData)
+						var ids = this.data.map(item=>{
+							return item.id
+						})
+						jsonData = jsonData.filter(item=>{
+							return !ids.includes(item.id)
+						})
+						this.data.push(...jsonData)
+						this.syncCurrentMessages(data)
+						if ($nextTick) {
+							$nextTick(()=>{
+								autoScroll()
+								highlightElement()
+							})
+						}
+						
+					});
+
 				},
 				setTitle(){
 					document.title = "ChatGPT-"+this.data[this.getIndex()].name;
@@ -527,12 +474,31 @@
 					}
 					return message
 				},
-				transformSystemMessage(message){
+				transformSystemMessage(message, current_messages){
 					var messages = [];
 					messages.push({
 						role:'system',
 						content: this.transformMessage(message)
 					})
+
+					// 示例message
+					var context_messages = JSON.parse(JSON.stringify(current_messages)).filter(function(message){
+						return message.is_context==1
+					}).map(function(message) {
+							if (message.is_self) {
+								return {
+									role: 'user',
+									content: message.content
+								}
+							} else {
+								return {
+									role: 'assistant',
+									content: message.content
+								}
+							}
+					})
+
+					messages.push(...context_messages)
 
 					// 不包含说明分开的
 					if (!this.getCurrentRole.prompt.includes('{prompt}')) {
@@ -588,6 +554,9 @@
 					store.roles.data[store.roles.getIndex()].messages = JSON.parse(JSON.stringify(store.roles.data[store.roles.getIndex()].messages)).slice(-max_message)
 					data.messages = store.roles.data[store.roles.getIndex()].messages
 				},
+				syncCurrentMessages(data){
+					data.messages = this.data[this.getIndex()].messages
+				},
 				
 				addRole(store, data, $nextTick) {
 					var name = this.role.name
@@ -604,7 +573,7 @@
 						}
 					}
 					
-					this.role.id = this.maxId() + 100;
+					this.role.id = this.maxId() + 100 ;
 					var role = JSON.parse(JSON.stringify(this.role))
 
 					this.addLocalRole(role)
@@ -615,10 +584,10 @@
 					this.changeRole(store, data, $nextTick, this.role.id)
 				},
 				maxId(){
-					let maxId = -Infinity; // 定义一个变量用于存储最大id的值，初始值设为负无穷
+					let maxId = 9999999; // 定义一个变量用于存储最大id的值，初始值设为负无穷
 
 					for (let i = 0; i < this.data.length; i++) { // 遍历二维数组的每个元素
-						if (this.data[i].id > maxId) { // 如果该对象的id比maxId大
+						if (this.data[i].is_custome && this.data[i].id > maxId) { // 如果该对象的id比maxId大
 							maxId = this.data[i].id; // 更新maxId的值
 						}
 					}
@@ -638,6 +607,7 @@
 					return {}
 				},
 				addLocalRole(role){
+					role.is_custome = true
 					this.data.push(role)
 				}
 			})
@@ -707,7 +677,7 @@
 			// }
 			// 专业聊天
 			else if (current_role.type==2) {
-				url = `/chatgpt?messages=${encodeURIComponent(JSON.stringify(store.roles.transformSystemMessage(data.message)))}`;
+				url = `/chatgpt?messages=${encodeURIComponent(JSON.stringify(store.roles.transformSystemMessage(data.message, data.messages)))}`;
 			}
 			
 			if (token) {
