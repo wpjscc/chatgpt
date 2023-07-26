@@ -103,7 +103,7 @@
 										<div class="">
 											<div class="p-3 rounded-r-lg rounded-bl-lg bg-gray-100 relative">
 												<div  x-html="markedParse(msg.content)" class="prose md:max-w-4xl"></div>
-												<div class="absolute -right-5 -top-5 z-auto" @click="$store.edit.edit(msg.content)">
+												<div class="absolute -right-5 -top-5 z-auto" @click="$store.edit.edit(msg.content, 'chatgpt')">
 													<button class="bg-blue-200 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full flex items-center">
 														<i class="material-icons">code</i>
 													</button>
