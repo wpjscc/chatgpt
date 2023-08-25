@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Wpjscc\React\Limiter\TokenBucket;
+
 class ChatGPTService
 {
     public function handle($stream, $data, $token)
@@ -51,19 +53,24 @@ class ChatGPTService
                     endEventStream($stream, '[/?token=xxxxx](?token=xxxxx)');
                 });
             } else {
-                $body->on('data', function ($chunk) use ($stream) {
-                    echo $chunk;
-                    $stream->write($chunk);
-                });
+                
+               (new \App\Services\BandwidthService($body, $stream))
+               ->setBandwidth(1024 * 1024 * 8, 1024 * 1024 * 8, 1000)
+               ->setSendStrlen(1)
+               ->send(true);
+                // $body->on('data', function ($chunk) use ($stream) {
+                //     echo $chunk;
+                //     $stream->write($chunk);
+                // });
 
-                $body->on('error', function (\Exception $e) {
-                    echo 'Error: ' . $e->getMessage() . PHP_EOL;
-                });
+                // $body->on('error', function (\Exception $e) {
+                //     echo 'Error: ' . $e->getMessage() . PHP_EOL;
+                // });
 
-                $body->on('close', function () use ($stream) {
-                    echo '[DONE]' . PHP_EOL;
-                    $stream->end();
-                });
+                // $body->on('close', function () use ($stream) {
+                //     echo '[DONE]' . PHP_EOL;
+                //     $stream->end();
+                // });
             }
         }, function (\Exception $e) use ($stream) {
             echo 'Error: ' . $e->getMessage() . PHP_EOL;
