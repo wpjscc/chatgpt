@@ -5,14 +5,15 @@ require __DIR__ . '/vendor/autoload.php';
 use App\Services\BucketManager;
 use React\Stream\ThroughStream;
 use Wpjscc\React\Limiter\TokenBucket;
+use function Wpjscc\React\Limiter\getMilliseconds;
 use React\EventLoop\Loop;
 use function React\Async\async;
 use function React\Async\await;
 
 
-DEFINE('KB', 50);
-define('BURST_RATE', 1024 * 1024 * 3 * KB );
-define('FILL_RATE', 1024 * 1024 * KB );
+DEFINE('KB', 100);
+define('BURST_RATE', 1024 * 1024 * 3 * KB);
+define('FILL_RATE', 1024 * 1024 * KB);
 
 if (getParam('--every-minute-times')) {
     BucketManager::setNumber((int) getParam('--every-minute-times'));
@@ -40,7 +41,7 @@ $app->get('/chatgpt', new App\Controllers\ChatGPTController());
 
 
 $app->get('/assets/{path}', function (Psr\Http\Message\ServerRequestInterface $request) {
-    $path = '/assets/'.$request->getAttribute('path');
+    $path = '/assets/' . $request->getAttribute('path');
     if (file_exists(__DIR__ . $path)) {
         $fileType = getFileType(__DIR__ . $path);
         $contentType = 'application/javascript';
@@ -51,17 +52,32 @@ $app->get('/assets/{path}', function (Psr\Http\Message\ServerRequestInterface $r
         $size = filesize(__DIR__ . $path);
 
         $bucket = new TokenBucket(BURST_RATE, FILL_RATE, 'sec');
-        
+        $bucket->setContent(BURST_RATE);
+
         $stream = new ThroughStream;
         $async = async(function () use (&$async, $stream, $path, &$p, $size, $bucket) {
 
-                if ($size < 1024 * KB) {
-                    await($bucket->removeTokens(1024 * 1024 * KB));
-                    $stream->end(file_get_contents(__DIR__ . $path));
+            if ($size/1024 < KB) {
+                await($bucket->removeTokens(1024 * 1024 * ceil($size/1024)));
+                $stream->end(file_get_contents(__DIR__ . $path));
+            } else {
+                if (($size-$p)/1024 < KB) {
+                    $start = getMilliseconds();
+                    await($bucket->removeTokens(1024 * 1024 * ceil($size-$p)/1024));
+                    $end = getMilliseconds();
+                    var_dump($end-$start, ($size-$p)/1024);
+                    $fp = fopen(__DIR__ . $path, 'r');
+                    fseek($fp, $p);
+                    $content = fread($fp, 1024 * KB);
+                    $p += strlen($content);
+                    fclose($fp);
+                    $stream->end($content);
                 } else {
-                   
+                    $start = getMilliseconds();
                     await($bucket->removeTokens(1024 * 1024 * KB));
-                    $fp = fopen(__DIR__ . $path,'r');
+                    $end = getMilliseconds();
+                    var_dump($end-$start, $size);
+                    $fp = fopen(__DIR__ . $path, 'r');
                     fseek($fp, $p);
                     $content = fread($fp, 1024 * KB);
                     $p += strlen($content);
@@ -73,13 +89,15 @@ $app->get('/assets/{path}', function (Psr\Http\Message\ServerRequestInterface $r
                         $async();
                     }
                 }
-            });
+                
+            }
+        });
 
-        
+
 
         Loop::addTimer(0.001, $async);
 
-       
+
 
 
         return new React\Http\Message\Response(
@@ -94,5 +112,3 @@ $app->get('/assets/{path}', function (Psr\Http\Message\ServerRequestInterface $r
 });
 
 $app->run();
-
-
