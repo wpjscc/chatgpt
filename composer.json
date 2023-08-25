@@ -3,7 +3,8 @@
     "type": "project",
     "require": {
         "clue/http-proxy-react": "^1.8",
-        "clue/framework-x": "dev-main"
+        "clue/framework-x": "dev-main",
+        "wpjscc/reactphp-limiter": "dev-master"
     },
     "autoload": {
         "psr-4": {

@@ -7,11 +7,23 @@ use React\Stream\ThroughStream;
 use React\EventLoop\Loop;
 use App\Services\BucketManager;
 use App\Services\ChatGPTService;
+use function React\Async\async;
+use function React\Async\await;
 
 class ChatGPTController
 {
     public function __invoke(ServerRequestInterface $request)
     {
+        return async(function () use ($request) {
+            return $this->handleRequest($request);
+        })();
+
+
+    }
+
+    protected function handleRequest($request)
+    {
+
         $params = $request->getQueryParams();
 
         $query = $params['query'] ?? '';
@@ -40,12 +52,17 @@ class ChatGPTController
             });
         }
 
+        $remainingRequests = 0;
         $havBucket = true;
         if (!$isCustomeToken) {
             $havBucket = BucketManager::getBucket();
+            $remainingRequests = await(BucketManager::getLimiter()->removeTokens(1));
 
             // 用完了
-            if ($havBucket === false) {
+            if ($remainingRequests < 0) {
+            // if ($havBucket === false) {
+                echo 'request-header:'. json_encode($request->getHeaders(), JSON_UNESCAPED_UNICODE) . "over\n";
+
                 Loop::get()->addTimer(0.01, function () use ($stream) {
                     endEventStream($stream, 'over '.BucketManager::getNumber() .' times in one minute please wait one minute');
                 });
@@ -54,7 +71,7 @@ class ChatGPTController
         }
 
 
-        if ($messages && $token && $havBucket) {
+        if ($messages && $token && $remainingRequests >= 0) {
             // https://platform.openai.com/docs/models/gpt-3-5
             // https://platform.openai.com/account/rate-limits
             // https://openai.com/pricing#language-models
@@ -71,7 +88,7 @@ class ChatGPTController
                     $data['max_tokens'] = (int) getParam('max-tokens');
                 }
             }
-
+            echo 'request-header:'. json_encode($request->getHeaders(), JSON_UNESCAPED_UNICODE) . "\n";
             echo 'request-data:'.json_encode($data, JSON_UNESCAPED_UNICODE) . "\n";
 
             (new ChatGPTService())->handle($stream, $data, $token);
@@ -87,6 +104,5 @@ class ChatGPTController
             ),
             $stream
         );
-
     }
 }

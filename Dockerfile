@@ -1,4 +1,4 @@
-ARG PHP_VERSION="wpjscc/php:8.0.9-fpm-alpine3.13"
+ARG PHP_VERSION="wpjscc/php:8.1.15-fpm-alpine"
 FROM ${PHP_VERSION}
 
 COPY  . /var/www

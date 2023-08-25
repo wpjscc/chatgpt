@@ -3,12 +3,14 @@
 namespace App\Services;
 
 use React\EventLoop\Loop;
+use Wpjscc\React\Limiter\RateLimiter;
 
 class BucketManager
 {
     protected static $buckets = [];
 
     protected static $number = 3;
+    protected static $limiter;
 
     public static function addBucket($default = 1)
     {
@@ -43,6 +45,19 @@ class BucketManager
     public static function getNumber()
     {
         return static::$number;
+    }
+
+    public static function initLimiter($number = 3, $interval = 'minute', $fireImmediately = true)
+    {
+        return static::$limiter = new RateLimiter($number, $interval, $fireImmediately);
+    }
+
+    public static function getLimiter()
+    {
+        if (!static::$limiter) {
+            static::initLimiter();
+        }
+        return static::$limiter;
     }
 
 }
