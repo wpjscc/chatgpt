@@ -11,7 +11,7 @@ use function React\Async\async;
 use function React\Async\await;
 
 
-DEFINE('KB', 100);
+DEFINE('KB', 50);
 define('BURST_RATE', 1024 * 1024 * 3 * KB);
 define('FILL_RATE', 1024 * 1024 * KB);
 
@@ -63,9 +63,9 @@ $app->get('/assets/{path}', function (Psr\Http\Message\ServerRequestInterface $r
             } else {
                 if (($size-$p)/1024 < KB) {
                     $start = getMilliseconds();
-                    await($bucket->removeTokens(1024 * 1024 * ceil($size-$p)/1024));
+                    await($bucket->removeTokens(1024 * 1024 * ceil(($size-$p)/1024)));
                     $end = getMilliseconds();
-                    var_dump($end-$start, ($size-$p)/1024);
+                    var_dump($end-$start, ($size-$p));
                     $fp = fopen(__DIR__ . $path, 'r');
                     fseek($fp, $p);
                     $content = fread($fp, 1024 * KB);
@@ -76,7 +76,7 @@ $app->get('/assets/{path}', function (Psr\Http\Message\ServerRequestInterface $r
                     $start = getMilliseconds();
                     await($bucket->removeTokens(1024 * 1024 * KB));
                     $end = getMilliseconds();
-                    var_dump($end-$start, $size);
+                    var_dump($end-$start, KB);
                     $fp = fopen(__DIR__ . $path, 'r');
                     fseek($fp, $p);
                     $content = fread($fp, 1024 * KB);

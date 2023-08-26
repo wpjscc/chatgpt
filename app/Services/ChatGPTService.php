@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Wpjscc\React\Limiter\TokenBucket;
+use function Wpjscc\React\Limiter\getMilliseconds;
 
 class ChatGPTService
 {
@@ -19,7 +20,7 @@ class ChatGPTService
         }
 
         $client = (new \React\Http\Browser($connector))->withTimeout(getParam('--timeout', 10));
-
+        \App\Services\BandwidthService::$start = getMilliseconds();
         $client->withRejectErrorResponse(false)->requestStreaming(
             'POST',
             'https://api.openai.com/v1/chat/completions',
@@ -55,7 +56,7 @@ class ChatGPTService
             } else {
                 
                (new \App\Services\BandwidthService($body, $stream))
-               ->setBandwidth(1024 * 1024 * 8, 1024 * 1024 * 8, 1000)
+               ->setBandwidth(1024 * 1024 * getParam('--kb', 1), 1024 * 1024 * getParam('--kb', 1), 1000)
                ->setSendStrlen(1)
                ->send(true);
                 // $body->on('data', function ($chunk) use ($stream) {

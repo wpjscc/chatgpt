@@ -7,6 +7,7 @@ use React\Stream\ReadableStreamInterface;
 use React\Stream\CompositeStream;
 use React\Stream\ThroughStream;
 use Wpjscc\React\Limiter\TokenBucket;
+use function Wpjscc\React\Limiter\getMilliseconds;
 use function React\Async\async;
 use function React\Async\await;
 
@@ -29,25 +30,58 @@ class BandwidthService
     protected $isSending = false;
 
 
+    public static $start = 0;
+
+    public static $startSend = 0;
+
+    public static $end = 0;
+
+    private $ms = 0;
+    private $size = 0;
+
+    private $starting = false;
+
+
     public function __construct(ReadableStreamInterface $readable, WritableStreamInterface $writeable)
     {
-       
+
+        static::$startSend = getMilliseconds();
+
         $this->writeable = $writeable;
 
-        $readable->on('data', function ($chunk) {
-            $this->status = 'data';
-            echo $chunk;
+        $_ms = getMilliseconds();
+        $_mss = 0;
+        $readable->on('data', function ($chunk) use (&$_ms, &$_mss) {
+            $cms = getMilliseconds();
+            $_mss += ($cms-$_ms);
+            $_ms = $cms;
 
+            $this->status = 'data';
             $this->buffer .= $chunk; 
             $this->send();
         });
 
-        $readable->on('error', function ($error) {
+        $readable->on('error', function ($error) use (&$_ms, &$_mss) {
+            $cms = getMilliseconds();
+            $_mss += ($cms-$_ms);
+            $_ms = $cms;
+
+
             $this->status = 'error';
             $this->send();
         });
 
-        $readable->on('close', function () {
+        $readable->on('close', function () use (&$_ms, &$_mss) {
+            $cms = getMilliseconds();
+            $_mss += ($cms-$_ms);
+            $_ms = $cms;
+
+            static::$end = getMilliseconds();
+            echo "request-use: ". (static::$startSend-static::$start) . "\n";
+            echo "response-use: ". $_mss . "\n";
+            echo "request-response-end: ". (static::$end-static::$start) . "\n";
+
+
             $this->status = 'close';
             $this->send();
         });
@@ -81,9 +115,12 @@ class BandwidthService
             }
         }
 
-       
-        $async = \React\Async\async(function () use (&$async) {
+        $start = getMilliseconds();
+        
+        $async = \React\Async\async(function () use (&$async, $start) {
             $this->isSendKB($async);
+            $end = getMilliseconds();
+            // echo "time8: ". ($end - $start) . "\n";
         });
 
         if ($force) {
@@ -91,30 +128,11 @@ class BandwidthService
             return;
         }
 
-        if ($this->status == 'data') {
-            if ($this->isSending) {
-                return;
-            }
-            $this->isSending = true;
-            $async();
-        } 
-        elseif ($this->status == 'error') {
-            if ($this->isSending) {
-                return;
-            }
-            $this->isSending = true;
-
-            $async();
-
+        if ($this->isSending) {
+            return;
         }
-        elseif ($this->status == 'close') {
-            if ($this->isSending) {
-                return;
-            }
-            $this->isSending = true;
-
-            $async();
-        }
+        $this->isSending = true;
+        $async();
 
     }
 
@@ -122,6 +140,11 @@ class BandwidthService
     {
         if ($this->status == 'close' || $this->status == 'error') {
             $this->writeable->end();
+            echo "true-send: ". $this->ms . "\n";
+            echo "true-size: ". $this->size . "\n";
+            echo "时间误差: ".($this->ms/1000 * 1.8) ."ms\n";
+            echo "没去掉时间误差,减去true-size 为". ($this->ms/1000 * $this->kb * 1024-$this->size) . "\n";
+            echo "去掉时间误差,减去true-size 为". (($this->ms-($this->ms/1000 * 1.8))/1000* $this->kb * 1024-$this->size) . "\n";
         }
     }
 
@@ -133,13 +156,14 @@ class BandwidthService
 
     public function isSendKB($async)
     {
+        static $isclose = false;
         if ($this->buffer) {
 
-
-            // if ((strlen($this->buffer) * 1024) < ($this->bandwidth/1000) && $this->status == 'data') {
-            //     $this->isSending = false;
-            //     return;
-            // }
+            if ($this->status == 'close' && !$isclose) {
+                $isclose = true;
+                echo "total:size-". strlen($this->buffer) . "\n";
+                echo "had-send:size-". $this->size . "\n";
+            }
 
             if ($this->sendStrlen) {
                 $size = min($this->sendStrlen, strlen($this->buffer));
@@ -148,24 +172,34 @@ class BandwidthService
             }
 
             if ($size * 1024 <= $this->bandwidth) {
-
+                $start = getMilliseconds();
                 await($this->bucket->removeTokens(1024 * $size));
-                $content = substr($this->buffer, 0, $size);
-                echo "hello 1-". $content."\n";
-
-                $this->buffer = substr($this->buffer, $size);
-                $this->writeable->write($content);
-            } else {
-
-
-                await($this->bucket->removeTokens($this->bandwidth));
-                $size = $this->bandwidth / 1024;
                
                 $content = substr($this->buffer, 0, $size);
-                echo "hello 2-". $content."\n";
                 $this->buffer = substr($this->buffer, $size);
                 $this->writeable->write($content);
+
+                $end = getMilliseconds();
+                $this->ms += ($end - $start);
+
+            } else {
+                $start = getMilliseconds();
+                await($this->bucket->removeTokens($this->bandwidth));
+               
+
+                $size = $this->bandwidth / 1024;
+                $content = substr($this->buffer, 0, $size);
+
+                $this->buffer = substr($this->buffer, $size);
+                $this->writeable->write($content);
+                
+                $end = getMilliseconds();
+
+                $this->ms += ($end - $start);
             }
+
+            $this->size += $size;
+
 
             if ($this->buffer) {
                 $async();
