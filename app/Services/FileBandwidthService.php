@@ -95,6 +95,10 @@ class FileBandwidthService
                     $p = $stream['position'];
                     $size = $stream['filesize'];
                     $writeable = $stream['stream'];
+
+                    if ($writeable->isWritable() === false) {
+                        return;
+                    }
                     $bucket = $this->bucket;
     
     

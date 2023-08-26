@@ -30,8 +30,18 @@ $app = new FrameworkX\App(
 );
 
 
-$app->get('/', function () {
-    return \React\Http\Message\Response::html(file_get_contents(__DIR__ . '/chat.html'));
+$app->get('/', function () use ($fileBandwidthService) {
+    // return \React\Http\Message\Response::html(file_get_contents(__DIR__ . '/chat.html'));
+    $stream = new ThroughStream;
+    $fileBandwidthService->addStream($stream, __DIR__ . '/chat.html');
+
+    return new React\Http\Message\Response(
+        React\Http\Message\Response::STATUS_OK,
+        array(
+            'Content-Type' => 'text/html; charset=utf-8',
+        ),
+        $stream
+    );
 });
 $app->get('/health', function () {
     return \React\Http\Message\Response::json([

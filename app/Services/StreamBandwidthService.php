@@ -156,6 +156,11 @@ class StreamBandwidthService
 
     public function isSendKB($async)
     {
+        if ($this->writeable->isWritable() === false) {
+            $this->buffer = '';
+            return;
+        }
+
         static $isclose = false;
         if ($this->buffer) {
 

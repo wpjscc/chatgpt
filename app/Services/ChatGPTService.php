@@ -20,7 +20,7 @@ class ChatGPTService
         }
 
         $client = (new \React\Http\Browser($connector))->withTimeout(getParam('--timeout', 10));
-        \App\Services\BandwidthService::$start = getMilliseconds();
+        \App\Services\StreamBandwidthService::$start = getMilliseconds();
         $client->withRejectErrorResponse(false)->requestStreaming(
             'POST',
             'https://api.openai.com/v1/chat/completions',
