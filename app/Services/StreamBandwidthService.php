@@ -11,7 +11,7 @@ use function Wpjscc\React\Limiter\getMilliseconds;
 use function React\Async\async;
 use function React\Async\await;
 
-class BandwidthService
+class StreamBandwidthService
 {
     protected WritableStreamInterface $writeable;
 

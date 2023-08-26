@@ -9,11 +9,13 @@ use function Wpjscc\React\Limiter\getMilliseconds;
 use React\EventLoop\Loop;
 use function React\Async\async;
 use function React\Async\await;
-
+use App\Services\FileBandwidthService;
 
 DEFINE('KB', 50);
 define('BURST_RATE', 1024 * 1024 * 3 * KB);
 define('FILL_RATE', 1024 * 1024 * KB);
+$fileBandwidthService = new FileBandwidthService(1024*1024*getParam('--filekb', 300), 1024*1024* getParam('--filekb', 100), 1000);
+$fileBandwidthService->run();
 
 if (getParam('--every-minute-times')) {
     BucketManager::setNumber((int) getParam('--every-minute-times'));
@@ -40,7 +42,7 @@ $app->get('/health', function () {
 $app->get('/chatgpt', new App\Controllers\ChatGPTController());
 
 
-$app->get('/assets/{path}', function (Psr\Http\Message\ServerRequestInterface $request) {
+$app->get('/assets/{path}', function (Psr\Http\Message\ServerRequestInterface $request) use ($fileBandwidthService) {
     $path = '/assets/' . $request->getAttribute('path');
     if (file_exists(__DIR__ . $path)) {
         $fileType = getFileType(__DIR__ . $path);
@@ -95,9 +97,11 @@ $app->get('/assets/{path}', function (Psr\Http\Message\ServerRequestInterface $r
 
 
 
-        Loop::addTimer(0.001, $async);
+        // Loop::addTimer(0.001, $async);
 
 
+
+        $fileBandwidthService->addStream($stream, __DIR__ . $path);
 
 
         return new React\Http\Message\Response(

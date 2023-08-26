@@ -55,7 +55,7 @@ class ChatGPTService
                 });
             } else {
                 
-               (new \App\Services\BandwidthService($body, $stream))
+               (new \App\Services\StreamBandwidthService($body, $stream))
                ->setBandwidth(1024 * 1024 * getParam('--kb', 1), 1024 * 1024 * getParam('--kb', 1), 1000)
                ->setSendStrlen(1)
                ->send(true);

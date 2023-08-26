@@ -4,7 +4,8 @@
     "require": {
         "clue/http-proxy-react": "^1.8",
         "clue/framework-x": "dev-main",
-        "wpjscc/reactphp-limiter": "dev-master"
+        "wpjscc/reactphp-limiter": "dev-master",
+        "wpjscc/filesystem": "^0.2@dev"
     },
     "autoload": {
         "psr-4": {
