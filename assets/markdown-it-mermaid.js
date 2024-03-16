@@ -89,7 +89,6 @@ const MermaidPlugIn = (md, opts) => {
   md.renderer.rules.fence = (tokens, idx, opts, env, self) => {
     const token = tokens[idx];
     const code = token.content.trim();
-    console.log(token.info.trim())
     if (token.info.trim() === _token) {
       return MermaidChart(code.replace(/(.*?)[ \n](.*?)([ \n])/, replacer));
     }
