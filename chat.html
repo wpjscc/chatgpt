@@ -261,11 +261,12 @@
 	<script src="/assets/flowbite.min.js"></script>
 	<script src="/assets/prism.js"></script>
 	<script src="/assets/prism-treeview.js"></script>
+	<script src="/assets/mermaid.min.js"></script>
+	<script src="/assets/markdown-it-mermaid.js"></script>
 	<!-- <script src="https://common-service.xiaofuwu.wpjs.cc/backend/wpjscc/flashjs/index/app/v5iLgmoybR"></script> -->
 	<script>
 		window.Prism = window.Prism || {};
 		window.Prism.manual = true;
-
 		function highlightElement(selector) {
 			document.querySelectorAll(selector || '#messages code').forEach((element) => {
 				window.Prism.highlightElement(element);
@@ -282,10 +283,11 @@
 						Alpine.store('code').code = env.element.innerText
 						Alpine.store('code').toggle()
 					} else {
-						Alpine.store('edit_code').code = markedParse(env.element.innerText)
+						Alpine.store('edit_code').code = markedParse(env.element.innerText, true)
 						setTimeout(() => {
 							window.highlightElement('#preview-edit code')
 						}, 200);
+
 						Alpine.store('edit_code').toggle()
 
 					}
@@ -784,6 +786,11 @@
 			var md = window.markdownit({
 				html: true,
 			});
+			md.use(MermaidPlugIn, 
+				// {
+				// 	startOnLoad: true,
+				// }
+			)
 			return md.render(content)
 		}
 
