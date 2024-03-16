@@ -141,8 +141,8 @@ class FileBandwidthService
                 })();
             };
 
-            $sendStream($stream);
-    
-        
+            Loop::futureTick(function () use ($stream, $sendStream) {
+                $sendStream($stream);
+            });
     }
 }
